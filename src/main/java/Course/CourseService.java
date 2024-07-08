@@ -1,13 +1,14 @@
 package Course;
 
+import Faculty.Faculty;
+
 import java.util.ArrayList;
 
 public class CourseService {
 
     private ArrayList<Course> courses;
 
-    public void addCourse(Course course){
-        courses.add(course);
-
+    public void addProfessorToCourse(Faculty professor, Course course) {
+        course.setProfessor(professor);
     }
 }
