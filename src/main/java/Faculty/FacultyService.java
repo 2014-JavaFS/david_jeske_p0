@@ -6,20 +6,19 @@ public class FacultyService {
 
     private ArrayList<Faculty> facultyList;
 
-    public void createFaculty(Faculty faculty) {
+    public void addFaculty(Faculty faculty) {
         facultyList.add(faculty);
-        if (!faculty.getTaughtCourses().isEmpty()) {
-            for (int i = 0; i < faculty.getTaughtCourses().size(); i++) {
-                if(faculty.getTaughtCourses().get(i).getProfessor()!=null){
-                    //TODO: exception/log for prof being replaced?
-                }
-                faculty.getTaughtCourses().get(i).setProfessor(faculty);
-            }
-        }
     }
 
     public boolean validateFaculty(Faculty faculty) {
-        //TODO: ACTUALLY WRITE THIS METHOD
+        //Search to check if faculty is already in facultyList
+        for (int i = 0; i < facultyList.size(); i++) {
+            if (facultyList.get(i).getFacultyID() == faculty.getFacultyID()) {
+                System.out.println(faculty + " already in system");
+                return false;
+            }
+        }
+        //TODO: add actual validation
         return true;
     }
 

@@ -3,25 +3,27 @@ package Course;
 import Faculty.Faculty;
 import Student.Student;
 
+import java.util.ArrayList;
+
 public class Course {
 
     private String courseCode;
-    private int sectionNumber;
     private Faculty professor;
-    private Student[] enrolled;
+    private ArrayList<Student> enrolled;
     private int creditHours;
+    private int capacity;
 
-    public Course(String courseCode, int sectionNumber, Faculty professor, int creditHours) {
+    public Course(String courseCode, Faculty professor, int creditHours, int capacity) {
         this.courseCode = courseCode;
-        this.sectionNumber = sectionNumber;
         this.professor = professor;
         this.creditHours = creditHours;
+        this.capacity = capacity;
     }
 
-    public Course(String courseCode, int sectionNumber, int creditHours) {
+    public Course(String courseCode, int creditHours, int capacity) {
         this.courseCode = courseCode;
-        this.sectionNumber = sectionNumber;
         this.creditHours = creditHours;
+        this.capacity = capacity;
     }
 
     //#region Getters & Setters
@@ -41,11 +43,11 @@ public class Course {
         this.professor = professor;
     }
 
-    public Student[] getEnrolled() {
+    public ArrayList<Student> getEnrolled() {
         return enrolled;
     }
 
-    public void setEnrolled(Student[] enrolled) {
+    public void setEnrolled(ArrayList<Student> enrolled) {
         this.enrolled = enrolled;
     }
 
@@ -56,14 +58,22 @@ public class Course {
     public void setCreditHours(int creditHours) {
         this.creditHours = creditHours;
     }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
     //#endregion
 
     @Override
     public String toString() {
         if (professor != null) {
-            return courseCode + ", Section " + sectionNumber + ", Prof. " + professor.getLastName();
+            return courseCode + ", Prof. " + professor.getLastName();
         } else {
-            return courseCode + ", Section " + sectionNumber + ", no professor assigned.";
+            return courseCode + ", no professor assigned.";
         }
     }
 }
