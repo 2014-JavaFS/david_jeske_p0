@@ -30,6 +30,7 @@ public class CourseController {
     public void addStudentToCourse(Student student, Course course) {
         if (course.getEnrolled().size() < course.getCapacity()) {
             course.getEnrolled().add(student);
+            student.getEnrolledCourses().add(course);
         } else {
             System.out.println("That course is full!");
         }

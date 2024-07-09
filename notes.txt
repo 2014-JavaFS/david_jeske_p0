@@ -1,0 +1,2 @@
+should student and faculty be made into 2 subclasses of an abstract "user"?
+probably, but unsure on the conventional structuring of where an abstract class would go
