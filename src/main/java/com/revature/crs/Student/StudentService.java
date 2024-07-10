@@ -1,13 +1,25 @@
 package com.revature.crs.Student;
 
+import com.revature.crs.util.interfaces.Serviceable;
+
 import java.util.ArrayList;
 
-public class StudentService {
+public class StudentService implements Serviceable<Student> {
 
-    private ArrayList<Student> studentList;
+    private ArrayList<Student> studentList = new ArrayList<>();
 
-    public void addStudent(Student student) {
+    @Override
+    public Student create(Student student) {
         studentList.add(student);
+        return student;
+    }
+
+    @Override
+    public Student findById(int userID) {
+        for (Student s : studentList){
+            if (s.getUserID()==userID) return s;
+        }
+        return null;
     }
 
     public boolean validateStudent(Student student) {

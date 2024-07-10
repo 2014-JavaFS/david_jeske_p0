@@ -10,14 +10,14 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-    public void createStudent() {
+    public void addStudent() {
         int id = 0;
         String fName = "Jane";
         String lName = "Smith";
         String email = "JSmith@uni.edu";
         String password = "1234";
         Student studentToAdd = new Student(id, fName, lName, email, password);
-        if (studentService.validateStudent(studentToAdd)) studentService.addStudent(studentToAdd);
+        if (studentService.validateStudent(studentToAdd)) studentService.create(studentToAdd);
         //TODO: ACTUALLY WRITE THIS METHOD
     }
 

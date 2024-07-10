@@ -10,14 +10,14 @@ public class FacultyController {
         this.facultyService = facultyService;
     }
 
-    public void createFaculty() {
+    public void addFaculty() {
         int id = 0;
         String fName = "John";
         String lName = "Doe";
         String email = "JDoe@uni.edu";
         String password = "1234";
         Faculty facultyToAdd = new Faculty(id, fName, lName, email, password);
-        if (facultyService.validateFaculty(facultyToAdd)) facultyService.addFaculty(facultyToAdd);
+        if (facultyService.validateFaculty(facultyToAdd)) facultyService.create(facultyToAdd);
         //TODO: ACTUALLY WRITE THIS METHOD
 
     }

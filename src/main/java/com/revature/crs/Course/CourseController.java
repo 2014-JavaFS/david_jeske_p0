@@ -11,16 +11,17 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-    public void createCourse() {
+    public void addCourse() {
+        int courseID = 1;
         String subject = "MATH";
         short courseNum = 101;
         short sectionNum = 1;
         String courseTitle = "Intro Math";
         short creditHours = 3;
         short capacity = 10;
-        Course courseToAdd = new Course(subject, courseNum, sectionNum, courseTitle, creditHours, capacity);
+        Course courseToAdd = new Course(courseID, subject, courseNum, sectionNum, courseTitle, creditHours, capacity);
         if (courseService.validateCourse(courseToAdd)) {
-            courseService.addCourse(courseToAdd);
+            courseService.create(courseToAdd);
         }
         //TODO: ACTUALLY WRITE THIS METHOD
     }

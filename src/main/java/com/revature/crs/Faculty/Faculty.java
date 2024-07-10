@@ -1,7 +1,7 @@
 package com.revature.crs.Faculty;
 
 import com.revature.crs.Course.Course;
-import com.revature.crs.User.User;
+import com.revature.crs.util.User;
 
 import java.util.ArrayList;
 

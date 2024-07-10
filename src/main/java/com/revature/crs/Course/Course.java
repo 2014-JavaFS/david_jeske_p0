@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public class Course {
 
+    private int courseID;
     private String subject;
     private short courseNum;
     private short sectionNum;
@@ -17,7 +18,8 @@ public class Course {
 
     private ArrayList<Student> enrolled;
 
-    public Course(String subject, short courseNumber, short sectionNumber, String courseTitle, short creditHours, short capacity, Faculty professor) {
+    public Course(int courseID, String subject, short courseNumber, short sectionNumber, String courseTitle, short creditHours, short capacity, Faculty professor) {
+        this.courseID=courseID;
         this.subject = subject;
         this.courseNum = courseNumber;
         this.sectionNum = sectionNumber;
@@ -27,7 +29,8 @@ public class Course {
         this.professor = professor;
     }
 
-    public Course(String subject, short courseNumber, short sectionNumber, String courseTitle, short creditHours, short capacity) {
+    public Course(int courseID, String subject, short courseNumber, short sectionNumber, String courseTitle, short creditHours, short capacity) {
+        this.courseID=courseID;
         this.subject = subject;
         this.courseNum = courseNumber;
         this.sectionNum = sectionNumber;
@@ -37,6 +40,14 @@ public class Course {
     }
 
     //#region Getters & Setters
+    public int getCourseID() {
+        return courseID;
+    }
+
+    public void setCourseID(int courseID) {
+        this.courseID = courseID;
+    }
+
     public String getSubject() {
         return subject;
     }
