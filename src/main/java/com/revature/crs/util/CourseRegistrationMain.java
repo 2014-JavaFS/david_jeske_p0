@@ -1,4 +1,4 @@
-package util;
+package com.revature.crs.util;
 
 import java.util.Scanner;
 

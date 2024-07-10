@@ -1,4 +1,4 @@
-package util.abstractClasses;
+package com.revature.crs.User;
 
 public abstract class User {
     private int userID;
