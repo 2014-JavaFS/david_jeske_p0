@@ -1,27 +1,22 @@
 package com.revature.crs.util.auth;
 
-import com.revature.crs.Faculty.FacultyService;
-import com.revature.crs.Student.StudentService;
-import com.revature.crs.util.User;
+import com.revature.crs.User.User;
+import com.revature.crs.User.UserService;
+
+import javax.naming.AuthenticationException;
 
 public class AuthService {
 
-    private final StudentService studentService;
-    private final FacultyService facultyService;
+    private final UserService userService;
 
-    public AuthService(StudentService studentService, FacultyService facultyService) {
-        this.studentService = studentService;
-        this.facultyService = facultyService;
+    public AuthService(UserService userService){
+        this.userService=userService;
     }
 
-    public User login(String email, String password) {
-        if (studentService.findByLogin(email, password) != null) {
-            return studentService.findByLogin(email, password);
-        }
-        if (facultyService.findByLogin(email, password) != null) {
-            return facultyService.findByLogin(email, password);
-        }
-        return null;
+    public User login(String email, String password) throws AuthenticationException {
+        User user = userService.findByLogin(email, password);
+        if (user == null) throw new AuthenticationException("Invalid credentials, please try again.");
+        return user;
     }
 }
 

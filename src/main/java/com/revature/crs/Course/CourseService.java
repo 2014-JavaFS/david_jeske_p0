@@ -1,79 +1,47 @@
 package com.revature.crs.Course;
 
-import com.revature.crs.Faculty.FacultyController;
 import com.revature.crs.util.exceptions.DataNotFoundException;
+import com.revature.crs.util.exceptions.InvalidInputException;
 import com.revature.crs.util.interfaces.Serviceable;
 
-import javax.swing.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CourseService implements Serviceable<Course> {
-
-    //private final FacultyController facultyController;
     private CourseRepository courseRepository;
 
-    private ArrayList<Course> courseList = new ArrayList<>();
-
-//    public CourseService(FacultyController facultyController) {
-//        this.facultyController = facultyController;
-//    }
-
-    public CourseService(CourseRepository courseRepository){
-        this.courseRepository=courseRepository;
+    public CourseService(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
     }
-
-//    @Override
-//    public Course create(Course course) {
-//        courseList.add(course);
-//        if (course.getProfessor() != null) {
-//            facultyController.addCourseToProfessor(course, course.getProfessor());
-//        }
-//        return course;
-//    }
 
     @Override
     public List<Course> findAll() {
         List<Course> courses = courseRepository.findAll();
-        if (courses.isEmpty()){
+        if (courses.isEmpty()) {
             throw new DataNotFoundException("No Courses Found.");
-        }else {
+        } else {
             return courses;
         }
     }
 
     @Override
-    public Course create(Course newObject) {
+    public Course create(Course newCourse) throws InvalidInputException {
+        validateMinCourse(newCourse);
+        return courseRepository.create(newCourse);
+    }
+
+    public Course findById(int id) {
+
         return null;
     }
 
-    public Course findById(int id){
-        for (Course c:courseList){
-            if(c.getCourseID()==id) return c;
-        }
-        return null;
-    }
-
-    public Course findByCourseCode(String courseCode) {
-        for (Course c : courseList) {
-            if (c.getCourseCode().equals(courseCode)) return c;
-        }
-        return null;
-    }
-
-    public Course findByTitle(String courseTitle) {
-        for (Course c : courseList) {
-            if (c.getCourseCode().equals(courseTitle)) return c;
-        }
-        return null;
-    }
-
-    public boolean validateCourse(Course course) {
-        //Search to check if course is already in courseList
-        for (Course c : courseList) {
-            if (course.getCourseCode().equals(c.getCourseCode())) return false;
-        }
-        //TODO: add actual validation
-        return true;
+    private void validateMinCourse(Course course) throws InvalidInputException {
+        if (course == null) throw new InvalidInputException("course is null, has not been instantiated");
+        String regex = "[A-Z]{4}\\d{3}-\\d";
+        //              [A-Z]{4}    checks for 4 capital letter, as subject
+        //              \\d{3}      checks for 3 digits, as a course number
+        //              -\\d{2}     checks for 1 digit following "-", as a section number
+        //              Example:    MATH101-1 for Math 101, Section 1
+        if (!course.getCourseCode().matches(regex)) throw new InvalidInputException("Malformed course code");
+        //TODO: other criteria
     }
 }

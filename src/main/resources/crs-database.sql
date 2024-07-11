@@ -4,14 +4,11 @@ drop table users;
 drop type user_enum;
 
 create table courses(
-		course_id serial primary key,
-		subject varchar(4) not null,
-		course_number smallint not null check (course_number>100 and course_number<999),
-		section_number smallint not null check (section_number>0 and section_number<99),
-		unique (subject, course_number, section_number),
+		course_code varchar(11) primary key,
 		course_title varchar(20) not null,
 		credit_hours smallint not null check (credit_hours>=0 and credit_hours<=9),
 		capacity smallint not null check (capacity>0),
+		enrolled smallint default 0,
 		professor int
 );
 
@@ -33,13 +30,13 @@ references users(user_id);
 
 --bridging table
 create table registrations(
-		course int,
+		course varchar(11),
 		student int
 );
 
 alter table registrations
-add constraint fk_course_id foreign key (course)
-references courses(course_id);
+add constraint fk_course_code foreign key (course)
+references courses(course_code);
 
 alter table registrations
 add constraint fk_student_user_id foreign key (student)
@@ -48,17 +45,17 @@ references users(user_id);
 
 insert into
 		courses(subject, course_number,	section_number,	course_title, credit_hours, capacity)
-values ('MATH', 101, 1,'Intro Math', 3, 50),
-		('MATH', 101, 2,'Intro Math', 3, 50),
-		('HIST', 204, 1,'US History II', 3, 35),
-		('POLS', 207, 1,'US Government', 3, 75),
+values ('MATH101-01','Intro Math', 3, 50),
+		('MATH101-02', 2,'Intro Math', 3, 50),
+		('HIST204-01','US History II', 3, 35),
+		('POLS207-01','US Government', 3, 75),
 		('PSYC', 107, 1,'Intro Psychology', 4, 25),
 		('PSYC', 107, 2,'Intro Psychology', 4, 25);
 		
 insert into
 		users
-values (default, 'FACULTY', 'John', 'Smith', 'JSmith01@uni.edu', default),
-		(default, default, 'Jimmy', 'Dean', 'JDean01@uni.edu', default),
-		(default, default, 'James', 'Cameron', 'JCameron01@uni.edu', default),
-		(default, default, 'Joan', 'Ofark', 'JOfark01@uni.edu', default),
-		(default, 'FACULTY', 'Jane', 'Smith', 'JSmith02@uni.edu', default);
+values (default, 'FACULTY', 'John', 'Smith', 'JSmith@uni.edu', default),
+		(default, default, 'Jimmy', 'Dean', 'JDean@uni.edu', default),
+		(default, default, 'James', 'Cameron', 'JCameron@uni.edu', default),
+		(default, default, 'Joan', 'Ofark', 'JOfark@uni.edu', default),
+		(default, 'FACULTY', 'Jane', 'Smith', 'JSmith2@uni.edu', default);

@@ -1,46 +1,56 @@
 package com.revature.crs.Course;
 
-import com.revature.crs.Faculty.Faculty;
-import com.revature.crs.Student.Student;
-
-import java.util.ArrayList;
+import com.revature.crs.User.User;
 
 public class Course {
 
     private int courseID;
-    private String subject;
-    private short courseNum;
-    private short sectionNum;
+    private String courseCode; //AAAA###-Z, AAAA=subject, ###=course_number, and Z=section_number, ex: MATH101-1
     private String courseTitle;
     private short creditHours;
     private short capacity;
-    private Faculty professor;
+    private short enrolled;
+    private User professor;
 
-    private ArrayList<Student> enrolled;
-
-    public Course(int courseID, String subject, short courseNumber, short sectionNumber, String courseTitle, short creditHours, short capacity, Faculty professor) {
-        this.courseID=courseID;
-        this.subject = subject;
-        this.courseNum = courseNumber;
-        this.sectionNum = sectionNumber;
+    public Course(int courseID, String courseCode, String courseTitle, short creditHours, short capacity, short enrolled, User professor) {
+        this.courseID = courseID;
+        this.courseCode = courseCode;
         this.courseTitle = courseTitle;
         this.creditHours = creditHours;
         this.capacity = capacity;
+        this.enrolled = enrolled;
         this.professor = professor;
     }
 
-    public Course(int courseID, String subject, short courseNumber, short sectionNumber, String courseTitle, short creditHours, short capacity) {
-        this.courseID=courseID;
-        this.subject = subject;
-        this.courseNum = courseNumber;
-        this.sectionNum = sectionNumber;
+    public Course(int courseID, String courseCode, String courseTitle, short creditHours, short capacity, User professor) {
+        this.courseID = courseID;
+        this.courseCode = courseCode;
         this.courseTitle = courseTitle;
         this.creditHours = creditHours;
         this.capacity = capacity;
+        this.enrolled = 0;
+        this.professor = professor;
+    }
+
+    public Course(int courseID, String courseCode, String courseTitle, short creditHours, short capacity, short enrolled) {
+        this.courseID = courseID;
+        this.courseCode = courseCode;
+        this.courseTitle = courseTitle;
+        this.creditHours = creditHours;
+        this.capacity = capacity;
+        this.enrolled = enrolled;
+    }
+
+    public Course(int courseID, String courseCode, String courseTitle, short creditHours, short capacity) {
+        this.courseID = courseID;
+        this.courseCode = courseCode;
+        this.courseTitle = courseTitle;
+        this.creditHours = creditHours;
+        this.capacity = capacity;
+        this.enrolled = 0;
     }
 
     public Course() {
-
     }
 
     //#region Getters & Setters
@@ -52,28 +62,12 @@ public class Course {
         this.courseID = courseID;
     }
 
-    public String getSubject() {
-        return subject;
+    public String getCourseCode() {
+        return courseCode;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public short getCourseNum() {
-        return courseNum;
-    }
-
-    public void setCourseNum(short courseNum) {
-        this.courseNum = courseNum;
-    }
-
-    public short getSectionNum() {
-        return sectionNum;
-    }
-
-    public void setSectionNum(short sectionNum) {
-        this.sectionNum = sectionNum;
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
     }
 
     public String getCourseTitle() {
@@ -100,27 +94,22 @@ public class Course {
         this.capacity = capacity;
     }
 
-    public Faculty getProfessor() {
-        return professor;
-    }
-
-    public void setProfessor(Faculty professor) {
-        this.professor = professor;
-    }
-
-    public ArrayList<Student> getEnrolled() {
+    public short getEnrolled() {
         return enrolled;
     }
 
-    public void setEnrolled(ArrayList<Student> enrolled) {
+    public void setEnrolled(short enrolled) {
         this.enrolled = enrolled;
     }
 
-    //#endregion
-
-    public String getCourseCode() {
-        return this.subject + this.courseNum + "-" + this.sectionNum;
+    public User getProfessor() {
+        return professor;
     }
+
+    public void setProfessor(User professor) {
+        this.professor = professor;
+    }
+    //#endregion
 
     @Override
     public String toString() {
