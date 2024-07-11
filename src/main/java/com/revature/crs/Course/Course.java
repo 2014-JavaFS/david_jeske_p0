@@ -39,6 +39,10 @@ public class Course {
         this.capacity = capacity;
     }
 
+    public Course() {
+
+    }
+
     //#region Getters & Setters
     public int getCourseID() {
         return courseID;
@@ -115,7 +119,7 @@ public class Course {
     //#endregion
 
     public String getCourseCode() {
-        return this.subject + this.courseNum + ", Section: " + this.sectionNum;
+        return this.subject + this.courseNum + "-" + this.sectionNum;
     }
 
     @Override

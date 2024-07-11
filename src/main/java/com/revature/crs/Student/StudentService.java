@@ -1,5 +1,6 @@
 package com.revature.crs.Student;
 
+import com.revature.crs.Faculty.Faculty;
 import com.revature.crs.util.interfaces.Serviceable;
 
 import java.util.ArrayList;
@@ -16,8 +17,17 @@ public class StudentService implements Serviceable<Student> {
 
     @Override
     public Student findById(int userID) {
-        for (Student s : studentList){
-            if (s.getUserID()==userID) return s;
+        for (Student s : studentList) {
+            if (s.getUserID() == userID) return s;
+        }
+        return null;
+    }
+
+    public Student findByLogin(String email, String password) {
+        for (Student s : studentList) {
+            if (s.getEmailAddress().equals(email) && s.getPassword().equals(password)) {
+                return s;
+            }
         }
         return null;
     }
