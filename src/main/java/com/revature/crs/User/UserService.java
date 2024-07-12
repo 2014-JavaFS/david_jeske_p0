@@ -4,6 +4,7 @@ import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.exceptions.InvalidInputException;
 import com.revature.crs.util.interfaces.Serviceable;
 
+import javax.naming.AuthenticationException;
 import java.util.List;
 
 public class UserService implements Serviceable<User> {
@@ -31,7 +32,7 @@ public class UserService implements Serviceable<User> {
         return userRepository.findById(userId);
     }
 
-    public User findByLogin(String email, String password) {
+    public User findByLogin(String email, String password) throws AuthenticationException {
         return userRepository.findByLogin(email, password);
     }
 

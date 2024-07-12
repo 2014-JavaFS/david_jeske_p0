@@ -5,7 +5,7 @@ import com.revature.crs.User.User;
 public class Course {
 
     private int courseID;
-    private String courseCode; //AAAA###-Z, AAAA=subject, ###=course_number, and Z=section_number, ex: MATH101-1
+    private String courseCode;
     private String courseTitle;
     private short creditHours;
     private short capacity;

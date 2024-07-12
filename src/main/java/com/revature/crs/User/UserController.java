@@ -23,9 +23,9 @@ public class UserController {
         String email = scanner.next();
         System.out.println("Password: ");
         String password = scanner.next();
-        User.UserType userType = User.UserType.valueOf("STUDENT");
+        boolean isFaculty = false;
 
-        User userToAdd = new User(count, firstName, lastName, email, password, userType);
+        User userToAdd = new User(count, firstName, lastName, email, password, isFaculty);
         try {
             userService.create(userToAdd);
         } catch (InvalidInputException e) {

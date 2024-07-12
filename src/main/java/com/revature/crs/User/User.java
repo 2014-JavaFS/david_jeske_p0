@@ -6,19 +6,18 @@ public class User {
     private String lastName;
     private String email;
     private String password;
-    private UserType type;
+    private boolean isFaculty;
 
-    public enum UserType {
-        STUDENT, FACULTY
-    }
-
-    public User(int userID, String firstName, String lastName, String email, String password, UserType userType) {
+    public User(int userID, String firstName, String lastName, String email, String password, boolean isFaculty) {
         this.userID = userID;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.type = userType;
+        this.isFaculty = isFaculty;
+    }
+
+    public User() {
     }
 
     //#region Getters & Setters
@@ -62,17 +61,19 @@ public class User {
         this.password = password;
     }
 
-    public UserType getType() {
-        return type;
+    public boolean isFaculty() {
+        return isFaculty;
     }
 
-    public void setType(UserType type) {
-        this.type = type;
+    public void setFaculty(boolean faculty) {
+        isFaculty = faculty;
     }
+
     //endregion
 
     @Override
     public String toString() {
-        return ("User{ID: " + userID + ", Name: " + firstName + " " + lastName + ", Email: " + email + ", Type: " + type+"}");
+        return ("User{ID: " + userID + ", Name: " + firstName + " " + lastName +
+                ", Email: " + email + (isFaculty ? ", Faculty" : ", Student") + "}");
     }
 }

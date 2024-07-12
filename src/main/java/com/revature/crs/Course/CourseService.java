@@ -37,7 +37,7 @@ public class CourseService implements Serviceable<Course> {
     private void validateMinCourse(Course course) throws InvalidInputException {
         if (course == null) throw new InvalidInputException("course is null, has not been instantiated");
         String regex = "[A-Z]{4}\\d{3}-\\d";
-        //              [A-Z]{4}    checks for 4 capital letter, as subject
+        //              [A-Z]{4}    checks for 4 capital letter, as subject/department
         //              \\d{3}      checks for 3 digits, as a course number
         //              -\\d{2}     checks for 1 digit following "-", as a section number
         //              Example:    MATH101-1 for Math 101, Section 1
