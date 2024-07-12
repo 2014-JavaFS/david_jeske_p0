@@ -22,10 +22,14 @@ public class UserService implements Serviceable<User> {
     }
 
     @Override
-    public User create(User newUser) throws InvalidInputException {
-        validateUser(newUser);
-
-        return userRepository.create(newUser);
+    public User create(User newUser) {
+        try {
+            validateUser(newUser);
+            return userRepository.create(newUser);
+        } catch (InvalidInputException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override

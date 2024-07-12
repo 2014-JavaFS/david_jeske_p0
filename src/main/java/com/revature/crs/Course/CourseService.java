@@ -16,37 +16,33 @@ public class CourseService implements Serviceable<Course> {
     @Override
     public List<Course> findAll() {
         List<Course> courses = courseRepository.findAll();
-        if (courses.isEmpty()) {
-            throw new DataNotFoundException("No Courses Found.");
-        } else {
-            return courses;
-        }
+        if (courses.isEmpty()) throw new DataNotFoundException("No Courses Found.");
+        else return courses;
     }
 
     @Override
     public Course create(Course newCourse) {
-            try {
-                validateMinCourse(newCourse);
-                return courseRepository.create(newCourse);
-            } catch (InvalidInputException e) {
-                e.printStackTrace();
-                return null;
-            }
+        try {
+            validateCourse(newCourse);
+            return courseRepository.create(newCourse);
+        } catch (InvalidInputException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
+    @Override
     public Course findById(int id) {
-
-        return null;
+        return courseRepository.findById(id);
     }
 
     public boolean update(Course course) throws InvalidInputException {
-        validateMinCourse(course);
+        validateCourse(course);
         return courseRepository.update(course);
     }
 
 
-
-    private void validateMinCourse(Course course) throws InvalidInputException {
+    private void validateCourse(Course course) throws InvalidInputException {
         if (course == null) throw new InvalidInputException("course is null, has not been instantiated");
         String regex = "[A-Z]{4}\\d{3}-\\d";
         //              [A-Z]{4}    checks for 4 capital letter, as subject/department

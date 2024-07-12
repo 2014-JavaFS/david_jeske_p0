@@ -4,7 +4,6 @@ import com.revature.crs.util.ConnectionFactory;
 import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.interfaces.Crudable;
 
-import javax.naming.AuthenticationException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,7 +26,7 @@ public class UserRepository implements Crudable<User> {
             preparedStatement.setBoolean(5, updatedUser.isFaculty());
             preparedStatement.setInt(6, updatedUser.getUserID());
             if (preparedStatement.executeUpdate(sql) == 0) throw new RuntimeException("User not found.");
-            return true;
+            else return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

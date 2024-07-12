@@ -31,6 +31,12 @@ public class CourseController implements Controller {
     }
 
     public void postNewCourse(Context ctx) {
+        boolean isFaculty = Boolean.parseBoolean(ctx.header("isFaculty"));
+        if (!isFaculty) {
+            ctx.status(403);
+            ctx.result("You do not have permission to create a new course.");
+            return;
+        }
         Course course = ctx.bodyAsClass(Course.class);
         ctx.json(courseService.create(course));
         ctx.status(HttpStatus.CREATED);

@@ -1,6 +1,7 @@
 package com.revature.crs.util.auth;
 
 import com.revature.crs.util.interfaces.Controller;
+import com.revature.crs.User.User;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
@@ -25,7 +26,9 @@ public class AuthController implements Controller {
         String password = ctx.queryParam("password");
 
         try {
-            authService.login(email, password);
+            User user = authService.login(email, password);
+            ctx.header("userID", String.valueOf(user.getUserID()));
+            ctx.header("isFaculty", String.valueOf(user.isFaculty()));
             ctx.status(200);
         } catch (AuthenticationException e) {
             ctx.status(HttpStatus.UNAUTHORIZED);
