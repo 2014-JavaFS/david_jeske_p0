@@ -11,8 +11,9 @@ create table users(
 		is_faculty boolean default false
 );
 
-create table courses(
-		course_code varchar(9) primary key,
+create table courses( 
+		course_id serial primary key,
+		course_code varchar(9) unique,
 		course_title varchar(25) not null,
 		credit_hours smallint not null check (credit_hours>=0 and credit_hours<=9),
 		capacity smallint not null check (capacity>0),
@@ -23,7 +24,7 @@ create table courses(
 --bridging table
 create table registrations(
 		registration_id serial primary key,
-		course_code varchar(9) references courses(course_code) not null,
+		course int references courses(course_id) not null,
 		student int references users(user_id) not null,
 		registration_date date default now()
 );
@@ -34,17 +35,17 @@ values  (default, 'John', 'Doe', 'JohnDoe@uni.edu', '123', true),
 		(default, 'June', 'Doe', 'JuneDoe@uni.edu', '123', true);
 
 insert into courses 
-values  ('MATH101-1', 'Intro Math', 2, 3, default, (select user_id from users where email like 'JohnDoe@uni.edu')),
-		('MATH101-2', 'Intro Math', 2, 3, default, (select user_id from users where email like 'JohnDoe@uni.edu')),
-		('HIST204-1', 'US History II', 3, 10, default, (select user_id from users where email like 'JaneDoe@uni.edu')),
-		('POLS207-1', 'US Government', 3, 10, default, (select user_id from users where email like 'JaneDoe@uni.edu')),
-		('PSYC107-1', 'Intro Psychology', 4, 10, default, (select user_id from users where email like 'JuneDoe@uni.edu')),
-		('PSYC107-2', 'Intro Psychology', 4, 10, default, (select user_id from users where email like 'JuneDoe@uni.edu'));
+values  (default, 'MATH101-1', 'Intro Math', 2, 3, 2, (select user_id from users where email like 'JohnDoe@uni.edu')),
+		(default, 'MATH101-2', 'Intro Math', 2, 3, default, (select user_id from users where email like 'JohnDoe@uni.edu')),
+		(default, 'HIST204-1', 'US History II', 3, 10, default, (select user_id from users where email like 'JaneDoe@uni.edu')),
+		(default, 'POLS207-1', 'US Government', 3, 10, default, (select user_id from users where email like 'JaneDoe@uni.edu')),
+		(default, 'PSYC107-1', 'Intro Psychology', 4, 10, default, (select user_id from users where email like 'JuneDoe@uni.edu')),
+		(default, 'PSYC107-2', 'Intro Psychology', 4, 10, default, (select user_id from users where email like 'JuneDoe@uni.edu'));
 		
 insert into users --Students
 values  (default, 'Jimmy', 'Smith', 'JimmySmith@uni.edu', '123', false),
 		(default, 'Jenny', 'Smith', 'JennySmith@uni.edu', '123', false);
 		
 insert into registrations 
-values	(default, 'MATH101-1', (select user_id from users where email like 'JimmySmith@uni.edu'), default),
-		(default, 'MATH101-1', (select user_id from users where email like 'JennySmith@uni.edu'), default);
+values	(default, (select course_id from courses where course_code like 'MATH101-1'), (select user_id from users where email like 'JimmySmith@uni.edu'), default),
+		(default, (select course_id from courses where course_code like 'MATH101-1'), (select user_id from users where email like 'JennySmith@uni.edu'), default);

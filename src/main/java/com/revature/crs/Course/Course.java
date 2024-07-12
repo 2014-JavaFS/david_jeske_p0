@@ -1,18 +1,15 @@
 package com.revature.crs.Course;
 
-import com.revature.crs.User.User;
-
 public class Course {
-
     private int courseID;
     private String courseCode;
     private String courseTitle;
     private short creditHours;
     private short capacity;
     private short enrolled;
-    private User professor;
+    private int professor;
 
-    public Course(int courseID, String courseCode, String courseTitle, short creditHours, short capacity, short enrolled, User professor) {
+    public Course(int courseID, String courseCode, String courseTitle, short creditHours, short capacity, short enrolled, int professor) {
         this.courseID = courseID;
         this.courseCode = courseCode;
         this.courseTitle = courseTitle;
@@ -22,7 +19,7 @@ public class Course {
         this.professor = professor;
     }
 
-    public Course(int courseID, String courseCode, String courseTitle, short creditHours, short capacity, User professor) {
+    public Course(int courseID, String courseCode, String courseTitle, short creditHours, short capacity, int professor) {
         this.courseID = courseID;
         this.courseCode = courseCode;
         this.courseTitle = courseTitle;
@@ -102,17 +99,17 @@ public class Course {
         this.enrolled = enrolled;
     }
 
-    public User getProfessor() {
+    public int getProfessor() {
         return professor;
     }
 
-    public void setProfessor(User professor) {
+    public void setProfessor(int professor) {
         this.professor = professor;
     }
     //#endregion
 
     @Override
     public String toString() {
-        return getCourseCode() + ": " + courseTitle + ", Prof. " + this.professor.getLastName();
+        return getCourseCode() + ": " + courseTitle;
     }
 }

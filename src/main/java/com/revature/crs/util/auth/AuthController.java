@@ -1,34 +1,34 @@
 package com.revature.crs.util.auth;
 
-import com.revature.crs.User.User;
+import com.revature.crs.util.interfaces.Controller;
+import io.javalin.Javalin;
+import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
 
 import javax.naming.AuthenticationException;
-import java.util.Scanner;
 
-public class AuthController {
+public class AuthController implements Controller {
 
-    private final Scanner scanner;
     private final AuthService authService;
 
-    public AuthController(AuthService authService, Scanner scanner) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.scanner = scanner;
     }
 
-    public User login(User userLoggedIn) {
+    @Override
+    public void registerPaths(Javalin app) {
+        app.post("/login", this::postLogin);
+    }
+
+    private void postLogin(Context ctx){
+        String email = ctx.queryParam("email");
+        String password = ctx.queryParam("password");
+
         try {
-            if (userLoggedIn != null) throw new RuntimeException("Already logged in");
-            System.out.println("Enter email: ");
-            String email = scanner.next();
-
-            System.out.println("Enter password: ");
-            String password = scanner.next();
-
-            return authService.login(email, password);
-        } catch (AuthenticationException | RuntimeException e) {
-            System.out.println(e.getMessage());
+            authService.login(email, password);
+            ctx.status(200);
+        } catch (AuthenticationException e) {
+            ctx.status(HttpStatus.UNAUTHORIZED);
         }
-        return userLoggedIn;
     }
-
 }

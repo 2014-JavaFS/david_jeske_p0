@@ -24,15 +24,27 @@ public class CourseService implements Serviceable<Course> {
     }
 
     @Override
-    public Course create(Course newCourse) throws InvalidInputException {
-        validateMinCourse(newCourse);
-        return courseRepository.create(newCourse);
+    public Course create(Course newCourse) {
+            try {
+                validateMinCourse(newCourse);
+                return courseRepository.create(newCourse);
+            } catch (InvalidInputException e) {
+                e.printStackTrace();
+                return null;
+            }
     }
 
     public Course findById(int id) {
 
         return null;
     }
+
+    public boolean update(Course course) throws InvalidInputException {
+        validateMinCourse(course);
+        return courseRepository.update(course);
+    }
+
+
 
     private void validateMinCourse(Course course) throws InvalidInputException {
         if (course == null) throw new InvalidInputException("course is null, has not been instantiated");

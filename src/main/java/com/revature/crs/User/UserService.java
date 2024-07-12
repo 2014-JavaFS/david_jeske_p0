@@ -24,6 +24,7 @@ public class UserService implements Serviceable<User> {
     @Override
     public User create(User newUser) throws InvalidInputException {
         validateUser(newUser);
+
         return userRepository.create(newUser);
     }
 
@@ -43,11 +44,12 @@ public class UserService implements Serviceable<User> {
 
     public void validateUser(User user) throws InvalidInputException {
         if (user == null) throw new InvalidInputException("User is null and not instantiated");
-        if (!user.getEmail().matches("\\w+(@uni\\.edu)")) {
-            //                  \\w+        checks for any amount of non-word characters (alphanumeric and underscore)
-            //                  (@uni.edu)  checks that String ends in "@uni.edu" as their assigned email.
-            throw new InvalidInputException("Incorrect email entered, remember to use uni.edu address.");
+        if (!user.getEmail().matches("\\w+@uni\\.edu")) {
+            //                  \\w+        checks for any amount of "word characters" (alphanumeric and underscore)
+            //                  @uni\\.edu  checks that String ends in "@uni.edu" as their assigned email.
+            throw new InvalidInputException("Incorrect email entered, remember to use @uni.edu address.");
         }
+        //TODO: check if user already matches another?
         //TODO: Password requirements?
     }
 }

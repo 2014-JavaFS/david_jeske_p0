@@ -19,11 +19,12 @@ public class CourseRepository implements Crudable<Course> {
 
     @Override
     public boolean update(Course updatedObject) {
+
         return false;
     }
 
     @Override
-    public boolean delete(int courseCode) {
+    public boolean delete(int courseID) {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
 
             return true;
@@ -37,19 +38,10 @@ public class CourseRepository implements Crudable<Course> {
     public List<Course> findAll() {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
             List<Course> courses = new ArrayList<>();
-
             String sql = "select * from courses";
-            ResultSet rs = conn.createStatement().executeQuery(sql);
+            ResultSet resultSet = conn.createStatement().executeQuery(sql);
 
-            while (rs.next()) {
-                Course course = new Course();
-
-                course.setCourseID(rs.getInt("course_id"));
-                //rest of record's attributes
-
-                courses.add(course);
-            }
-
+            while (resultSet.next()) courses.add(generateCourseFromResultSet(resultSet));
             return courses;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -58,22 +50,17 @@ public class CourseRepository implements Crudable<Course> {
     }
 
     @Override
-    public Course create(Course newCourse) throws InvalidInputException {
+    public Course create(Course newCourse) {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
-            //SQL for insert
-
-            //DO NOT USE STATEMENT FOR DML (insert, update, delete)
-            String sql = "insert into courses(course_id, course_code, course_title, credit_hours, capacity) values(?,?,?,?,?,?,?)";
-            //PreparedStatement SANITIZES user input before execution
+            String sql = "insert into courses values(default,?,?,?,?,?,?)";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
-
-            //SQL 1-index, NOT 0-index
-            preparedStatement.setInt(1, newCourse.getCourseID());
-            preparedStatement.setString(2, "MATH");
-
-            if (preparedStatement.executeUpdate(sql) == 0) {
-                throw new RuntimeException("new record was not inserted");
-            }
+            preparedStatement.setString(1, newCourse.getCourseCode());
+            preparedStatement.setString(2, newCourse.getCourseTitle());
+            preparedStatement.setShort(3, newCourse.getCreditHours());
+            preparedStatement.setShort(4, newCourse.getCapacity());
+            preparedStatement.setShort(5, newCourse.getEnrolled());
+            preparedStatement.setInt(6, newCourse.getProfessor());
+            if (preparedStatement.executeUpdate(sql) == 0) throw new RuntimeException("Course not added");
             return newCourse;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -84,14 +71,13 @@ public class CourseRepository implements Crudable<Course> {
     @Override
     public Course findById(int id) {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
-
             String sql = "select * from courses where course_id = ?";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, id);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             if (!resultSet.next()) {
-                throw new DataNotFoundException("No course with that id " + id + " exists in database.");
+                throw new DataNotFoundException("No course with id:" + id + " exists in database.");
             }
             return generateCourseFromResultSet(resultSet);
         } catch (SQLException e) {
@@ -102,11 +88,12 @@ public class CourseRepository implements Crudable<Course> {
 
     private Course generateCourseFromResultSet(ResultSet resultSet) throws SQLException {
         Course course = new Course();
-        course.setCourseID(resultSet.getInt("course_id"));
         course.setCourseCode(resultSet.getString("course_code"));
         course.setCourseTitle(resultSet.getString("course_title"));
         course.setCreditHours(resultSet.getShort("credit_hours"));
         course.setCapacity(resultSet.getShort("capacity"));
+        course.setEnrolled(resultSet.getShort("enrolled"));
+        course.setProfessor(resultSet.getInt("professor"));
         return course;
     }
 }
