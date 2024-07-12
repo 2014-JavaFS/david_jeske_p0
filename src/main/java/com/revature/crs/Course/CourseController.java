@@ -1,43 +1,30 @@
 package com.revature.crs.Course;
 
-import com.revature.crs.Faculty.Faculty;
-import com.revature.crs.Student.Student;
+import java.util.Scanner;
 
 public class CourseController {
 
     private final CourseService courseService;
+    private final Scanner scanner;
 
-    public CourseController(CourseService courseService) {
+    public CourseController(CourseService courseService, Scanner scanner) {
         this.courseService = courseService;
+        this.scanner = scanner;
+    }
+
+    public void searchCourses() {
+        //TODO: write this
     }
 
     public void addCourse() {
-        int courseID = 1;
-        String subject = "MATH";
-        short courseNum = 101;
-        short sectionNum = 1;
-        String courseTitle = "Intro Math";
-        short creditHours = 3;
-        short capacity = 10;
-        Course courseToAdd = new Course(courseID, subject, courseNum, sectionNum, courseTitle, creditHours, capacity);
-        if (courseService.validateCourse(courseToAdd)) {
-            courseService.create(courseToAdd);
-        }
-        //TODO: ACTUALLY WRITE THIS METHOD
+        //TODO: write this
     }
 
-    public void addProfessorToCourse(Faculty professor, Course course) {
-        course.setProfessor(professor);
-        //TODO: add a check for if this replaces a prof, and log it or something?
+    public void updateCourse() {
+        //TODO: write this (update & delete)
     }
 
-    public void addStudentToCourse(Student student, Course course) {
-        if (course.getEnrolled().size() < course.getCapacity()) {
-            course.getEnrolled().add(student);
-            student.getEnrolledCourses().add(course);
-        } else {
-            System.out.println("That course is full!");
-        }
+    public void deleteCourse() {
+        //TODO: write this (update & delete)
     }
-
 }

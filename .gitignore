@@ -32,5 +32,5 @@ bin/
 .DS_Store
 
 target/
-/.idea/
 src/main/resources/db.properties
+/.idea/

@@ -19,7 +19,6 @@ public class ConnectionFactory {
         }
     }
 
-
     static {
         try {
             Class.forName("org.postgresql.Driver");
@@ -34,9 +33,9 @@ public class ConnectionFactory {
 
     public Connection getConnection() {
         try {
-            //Set up db.properties for obfuscation
+            //Set up db.properties in resources directory
             return DriverManager.getConnection(properties.getProperty("url"),
-                    properties.getProperty("username"),
+                    properties.getProperty("user"),
                     properties.getProperty("password"));
         } catch (SQLException e) {
             e.printStackTrace();
