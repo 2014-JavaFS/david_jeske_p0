@@ -4,8 +4,9 @@ import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.exceptions.InvalidInputException;
 import com.revature.crs.util.interfaces.Serviceable;
 
-import javax.naming.AuthenticationException;
 import java.util.List;
+
+import static com.revature.crs.util.CourseRegistrationFrontController.logger;
 
 public class UserService implements Serviceable<User> {
     private UserRepository userRepository;
@@ -34,10 +35,14 @@ public class UserService implements Serviceable<User> {
 
     @Override
     public User findById(int userId) {
-        return userRepository.findById(userId);
+        logger.info("User request was sent to service with id: {}", userId);
+        User userFound = userRepository.findById(userId);
+        logger.info("User as found: {}", userFound);
+        return userFound;
     }
 
-    public User findByLogin(String email, String password) throws AuthenticationException {
+    public User findByLogin(String email, String password) {
+        logger.info("user attempting log in with email: {}", email);
         return userRepository.findByLogin(email, password);
     }
 
@@ -47,6 +52,7 @@ public class UserService implements Serviceable<User> {
     }
 
     public void validateUser(User user) throws InvalidInputException {
+        logger.info("validating user: {}", user);
         if (user == null) throw new InvalidInputException("User is null and not instantiated");
         if (!user.getEmail().matches("\\w+@uni\\.edu")) {
             //                  \\w+        checks for any amount of "word characters" (alphanumeric and underscore)

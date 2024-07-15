@@ -1,28 +1,28 @@
-package com.revature.crs.RegistrationRecord;
+package com.revature.crs.Registration;
 
 import java.time.LocalDate;
 
-public class RegistrationRecord {
+public class Registration {
     private int registrationID;
     private int courseID;
     private int studentID;
     private LocalDate registrationDate;
 
-    public RegistrationRecord(int registrationID, int courseID, int studentID, LocalDate registrationDate) {
+    public Registration(int registrationID, int courseID, int studentID, LocalDate registrationDate) {
         this.registrationID = registrationID;
         this.courseID = courseID;
         this.studentID = studentID;
         this.registrationDate = registrationDate;
     }
 
-    public RegistrationRecord(int registrationID, int courseID, int studentID) {
+    public Registration(int registrationID, int courseID, int studentID) {
         this.registrationID = registrationID;
         this.courseID = courseID;
         this.studentID = studentID;
         this.registrationDate = LocalDate.now();
     }
 
-    public RegistrationRecord() {
+    public Registration() {
     }
 
     //#region Getters & Setters

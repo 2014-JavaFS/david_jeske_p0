@@ -1,5 +1,6 @@
 package com.revature.crs.Course;
 
+import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.exceptions.InvalidInputException;
 import com.revature.crs.util.interfaces.Controller;
 import io.javalin.Javalin;
@@ -8,8 +9,9 @@ import io.javalin.http.HttpStatus;
 
 import java.util.List;
 
-public class CourseController implements Controller {
+import static com.revature.crs.util.CourseRegistrationFrontController.logger;
 
+public class CourseController implements Controller {
     private final CourseService courseService;
 
     public CourseController(CourseService courseService) {
@@ -31,12 +33,16 @@ public class CourseController implements Controller {
     }
 
     public void postNewCourse(Context ctx) {
-        boolean isFaculty = Boolean.parseBoolean(ctx.header("isFaculty"));
-        if (!isFaculty) {
+        boolean isFaculty = Boolean.valueOf(ctx.header("isFaculty"));
+        logger.info("isFaculty from header: {}", isFaculty);
+        //TODO change this back to actually check if user is faculty
+        if (isFaculty) {
+            logger.info("logged in user is not faculty");
             ctx.status(403);
             ctx.result("You do not have permission to create a new course.");
             return;
         }
+        logger.info("logged in user is faculty, creating Course...");
         Course course = ctx.bodyAsClass(Course.class);
         ctx.json(courseService.create(course));
         ctx.status(HttpStatus.CREATED);
@@ -44,8 +50,17 @@ public class CourseController implements Controller {
 
     public void getCourseById(Context ctx) {
         int courseID = Integer.parseInt(ctx.pathParam("course_id"));
-        Course courseFound = courseService.findById(courseID);
-        ctx.json(courseFound);
+        logger.info("Course number {} was sent through path parameter");
+        try{
+            Course courseFound = courseService.findById(courseID);
+            logger.info("Course to be returned: {}", courseFound);
+            ctx.json(courseFound);
+        } catch (DataNotFoundException e){
+            logger.warn("Information for courseID {} was not found", courseID);
+        } catch (RuntimeException e){
+            logger.warn("Unexpected runtime exception");
+        }
+
     }
 
     public void putUpdateCourse(Context ctx) {

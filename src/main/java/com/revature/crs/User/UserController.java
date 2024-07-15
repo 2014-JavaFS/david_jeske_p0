@@ -19,7 +19,7 @@ public class UserController implements Controller {
     public void registerPaths(Javalin app) {
         app.get("/users", this::getAllUsers);
         app.post("/users", this::postNewUser);
-        app.get("/users/{user_id}", this::getUserById); //Path Parameter
+        app.get("/users/{user_id}", this::getUserById);
         app.put("/users", this::putUpdateUser);
     }
 
@@ -29,6 +29,7 @@ public class UserController implements Controller {
     }
 
     public void postNewUser(Context ctx) {
+        //TODO restrict to unlogged-in users? only for registering new account?
         User user = ctx.bodyAsClass(User.class);
         ctx.json(userService.create(user));
         ctx.status(HttpStatus.CREATED);

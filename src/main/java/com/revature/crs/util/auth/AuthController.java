@@ -8,6 +8,8 @@ import io.javalin.http.HttpStatus;
 
 import javax.naming.AuthenticationException;
 
+import static com.revature.crs.util.CourseRegistrationFrontController.logger;
+
 public class AuthController implements Controller {
 
     private final AuthService authService;
@@ -28,7 +30,9 @@ public class AuthController implements Controller {
         try {
             User user = authService.login(email, password);
             ctx.header("userID", String.valueOf(user.getUserID()));
+            logger.info("attempting to set header to: {}", user.isFaculty());
             ctx.header("isFaculty", String.valueOf(user.isFaculty()));
+            logger.info("header set to: {}", ctx.header("isFaculty"));
             ctx.status(200);
         } catch (AuthenticationException e) {
             ctx.status(HttpStatus.UNAUTHORIZED);

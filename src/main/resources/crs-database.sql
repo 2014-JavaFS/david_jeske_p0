@@ -15,7 +15,6 @@ create table courses(
 		course_id serial primary key,
 		course_code varchar(9) unique,
 		course_title varchar(25) not null,
-		credit_hours smallint not null check (credit_hours>=0 and credit_hours<=9),
 		capacity smallint not null check (capacity>0),
 		enrolled smallint default 0,
 		professor int references users(user_id) not null
@@ -35,17 +34,26 @@ values  (default, 'John', 'Doe', 'JohnDoe@uni.edu', '123', true),
 		(default, 'June', 'Doe', 'JuneDoe@uni.edu', '123', true);
 
 insert into courses 
-values  (default, 'MATH101-1', 'Intro Math', 2, 3, 2, (select user_id from users where email like 'JohnDoe@uni.edu')),
-		(default, 'MATH101-2', 'Intro Math', 2, 3, default, (select user_id from users where email like 'JohnDoe@uni.edu')),
-		(default, 'HIST204-1', 'US History II', 3, 10, default, (select user_id from users where email like 'JaneDoe@uni.edu')),
-		(default, 'POLS207-1', 'US Government', 3, 10, default, (select user_id from users where email like 'JaneDoe@uni.edu')),
-		(default, 'PSYC107-1', 'Intro Psychology', 4, 10, default, (select user_id from users where email like 'JuneDoe@uni.edu')),
-		(default, 'PSYC107-2', 'Intro Psychology', 4, 10, default, (select user_id from users where email like 'JuneDoe@uni.edu'));
+values  (default, 'MATH101-1', 'Intro Math', 3, 2, (select user_id from users where email like 'JohnDoe@uni.edu')),
+		(default, 'MATH101-2', 'Intro Math', 3, default, (select user_id from users where email like 'JohnDoe@uni.edu')),
+		(default, 'HIST204-1', 'US History II', 10, default, (select user_id from users where email like 'JaneDoe@uni.edu')),
+		(default, 'POLS207-1', 'US Government', 10, default, (select user_id from users where email like 'JaneDoe@uni.edu')),
+		(default, 'PSYC107-1', 'Intro Psychology', 10, default, (select user_id from users where email like 'JuneDoe@uni.edu')),
+		(default, 'PSYC107-2', 'Intro Psychology', 10, default, (select user_id from users where email like 'JuneDoe@uni.edu'));
 		
 insert into users --Students
-values  (default, 'Jimmy', 'Smith', 'JimmySmith@uni.edu', '123', false),
-		(default, 'Jenny', 'Smith', 'JennySmith@uni.edu', '123', false);
+values  (default, 'Sam', 'Smith', 'SamSmith@uni.edu', '123', false),
+		(default, 'Sammy', 'Smith', 'SammySmith@uni.edu', '123', false),
+		(default, 'Frank', 'Smith', 'FrankSmith@uni.edu', '123', false),
+		(default, 'Frankie', 'Smith', 'FrankieSmith@uni.edu', '123', false),
+		(default, 'Theo', 'Smith', 'TheoSmith@uni.edu', '123', false),
+		(default, 'Thea', 'Smith', 'TheaSmith@uni.edu', '123', false);
 		
 insert into registrations 
-values	(default, (select course_id from courses where course_code like 'MATH101-1'), (select user_id from users where email like 'JimmySmith@uni.edu'), default),
-		(default, (select course_id from courses where course_code like 'MATH101-1'), (select user_id from users where email like 'JennySmith@uni.edu'), default);
+values	(default, (select course_id from courses where course_code like 'MATH101-1'), (select user_id from users where email like 'SamSmith@uni.edu'), default),	
+		(default, (select course_id from courses where course_code like 'MATH101-1'), (select user_id from users where email like 'SammySmith@uni.edu'), default),
+		(default, (select course_id from courses where course_code like 'MATH101-1'), (select user_id from users where email like 'FrankSmith@uni.edu'), default);
+		
+	
+	
+	

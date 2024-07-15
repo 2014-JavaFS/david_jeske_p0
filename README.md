@@ -22,3 +22,8 @@ As a student, I can:
 -   [ ] register for an open and available class
 -   [ ] cancel my registration for a class (if within window)
 -   [ ] view the classes that I have registered for
+
+
+### Need to fix:
+
+- isFaculty header value/storing and retrieving it?

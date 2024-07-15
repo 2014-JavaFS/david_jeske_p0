@@ -16,6 +16,8 @@ public class AuthService {
     public User login(String email, String password) throws AuthenticationException {
         User user = userService.findByLogin(email, password);
         if (user == null) throw new AuthenticationException("Invalid credentials, please try again.");
+        if (user.isFaculty()) System.out.println("welcome faculty");
+        else System.out.println("welcome student");
         return user;
     }
 }
