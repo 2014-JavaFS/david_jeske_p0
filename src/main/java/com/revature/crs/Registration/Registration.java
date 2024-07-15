@@ -3,22 +3,22 @@ package com.revature.crs.Registration;
 import java.time.LocalDate;
 
 public class Registration {
-    private int registrationID;
-    private int courseID;
-    private int studentID;
+    private int registrationId;
+    private int courseId;
+    private int studentId;
     private LocalDate registrationDate;
 
-    public Registration(int registrationID, int courseID, int studentID, LocalDate registrationDate) {
-        this.registrationID = registrationID;
-        this.courseID = courseID;
-        this.studentID = studentID;
+    public Registration(int registrationId, int courseId, int studentId, LocalDate registrationDate) {
+        this.registrationId = registrationId;
+        this.courseId = courseId;
+        this.studentId = studentId;
         this.registrationDate = registrationDate;
     }
 
-    public Registration(int registrationID, int courseID, int studentID) {
-        this.registrationID = registrationID;
-        this.courseID = courseID;
-        this.studentID = studentID;
+    public Registration(int registrationId, int courseId, int studentId) {
+        this.registrationId = registrationId;
+        this.courseId = courseId;
+        this.studentId = studentId;
         this.registrationDate = LocalDate.now();
     }
 
@@ -26,28 +26,28 @@ public class Registration {
     }
 
     //#region Getters & Setters
-    public int getRegistrationID() {
-        return registrationID;
+    public int getRegistrationId() {
+        return registrationId;
     }
 
-    public void setRegistrationID(int registrationID) {
-        this.registrationID = registrationID;
+    public void setRegistrationId(int registrationId) {
+        this.registrationId = registrationId;
     }
 
-    public int getCourseID() {
-        return courseID;
+    public int getCourseId() {
+        return courseId;
     }
 
-    public void setCourseID(int courseID) {
-        this.courseID = courseID;
+    public void setCourseId(int courseId) {
+        this.courseId = courseId;
     }
 
-    public int getStudentID() {
-        return studentID;
+    public int getStudentId() {
+        return studentId;
     }
 
-    public void setStudentID(int studentID) {
-        this.studentID = studentID;
+    public void setStudentId(int studentId) {
+        this.studentId = studentId;
     }
 
     public LocalDate getRegistrationDate() {
@@ -61,9 +61,9 @@ public class Registration {
 
     @Override
     public String toString() {
-        return ("RegisID: " + registrationID +
-                ", courseID: " + courseID +
-                ", studentID: " + studentID +
+        return ("RegisID: " + registrationId +
+                ", courseID: " + courseId +
+                ", studentID: " + studentId +
                 ", record made: " + registrationDate.toString());
     }
 }

@@ -43,10 +43,10 @@ public class RegistrationService implements Serviceable<Registration> {
 
     public void validateRegistration(Registration registration) throws InvalidInputException {
         if (registration == null) throw new InvalidInputException("User is null and not instantiated");
-        if (registration.getRegistrationID() <= 0) throw new InvalidInputException("no registrationID");
-        if (registration.getCourseID() <= 0) throw new InvalidInputException("no courseID");
-        if (registration.getStudentID() <= 0) throw new InvalidInputException("no studentID");
+        if (registration.getRegistrationId() <= 0) throw new InvalidInputException("no registrationID");
+        if (registration.getCourseId() <= 0) throw new InvalidInputException("no courseID");
+        if (registration.getStudentId() <= 0) throw new InvalidInputException("no studentID");
         if (registration.getRegistrationDate() == null) throw new InvalidInputException("no registrationDate");
-
+        //TODO: maybe flesh this out more
     }
 }
