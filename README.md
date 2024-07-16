@@ -17,8 +17,8 @@ As any kind of user, I can:
 
 ### As a student, I can:
 
--   [x] register a new account with the system (must be secured with a password)
--   [x] view classes available for registration
--   [x] register for an open and available class
+-   [X] register a new account with the system (must be secured with a password)
+-   [X] view classes available for registration
+-   [X] register for an open and available class
 -   [ ] cancel my registration for a class (if within window)
--   [x] view the classes that I have registered for
+-   [X] view the classes that I have registered for
