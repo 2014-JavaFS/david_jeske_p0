@@ -5,9 +5,9 @@ drop table courses cascade;
 create table users(
 		user_id serial primary key,
 		first_name varchar(20),
-		last_name varchar(30),
-		email varchar(50) unique not null,
-		password varchar(64) not null,
+		last_name varchar(20),
+		email varchar(30) unique not null,
+		password varchar(32) not null,
 		is_faculty boolean default false
 );
 
@@ -23,8 +23,9 @@ create table courses(
 --bridging table
 create table registrations(
 		registration_id serial primary key,
-		course int references courses(course_id) not null,
-		student int references users(user_id) not null,
+		course int references courses(course_id) on update cascade on delete cascade not null,
+		student int references users(user_id) on update cascade on delete cascade not null,
+		unique(course, student),
 		registration_date date default now()
 );
 		
@@ -34,7 +35,7 @@ values  (default, 'John', 'Doe', 'JohnDoe@uni.edu', '123', true),
 		(default, 'June', 'Doe', 'JuneDoe@uni.edu', '123', true);
 
 insert into courses 
-values  (default, 'MATH101-1', 'Intro Math', 3, 2, (select user_id from users where email like 'JohnDoe@uni.edu')),
+values  (default, 'MATH101-1', 'Intro Math', 3, default, (select user_id from users where email like 'JohnDoe@uni.edu')),
 		(default, 'MATH101-2', 'Intro Math', 3, default, (select user_id from users where email like 'JohnDoe@uni.edu')),
 		(default, 'HIST204-1', 'US History II', 10, default, (select user_id from users where email like 'JaneDoe@uni.edu')),
 		(default, 'POLS207-1', 'US Government', 10, default, (select user_id from users where email like 'JaneDoe@uni.edu')),
@@ -49,11 +50,72 @@ values  (default, 'Sam', 'Smith', 'SamSmith@uni.edu', '123', false),
 		(default, 'Theo', 'Smith', 'TheoSmith@uni.edu', '123', false),
 		(default, 'Thea', 'Smith', 'TheaSmith@uni.edu', '123', false);
 		
-insert into registrations 
-values	(default, (select course_id from courses where course_code like 'MATH101-1'), (select user_id from users where email like 'SamSmith@uni.edu'), default),	
-		(default, (select course_id from courses where course_code like 'MATH101-1'), (select user_id from users where email like 'SammySmith@uni.edu'), default),
-		(default, (select course_id from courses where course_code like 'MATH101-1'), (select user_id from users where email like 'FrankSmith@uni.edu'), default);
+	
+-- PROCEDURES
+create or replace procedure new_registration(
+		in p_course int,
+		in p_student int
+)
+	language plpgsql
+	as $$
+	begin 
+		insert into registrations values (default, p_course, p_student, default);
+		update courses set enrolled = enrolled + 1 where course_id = p_course;
+	end;
+$$;
+
+create or replace procedure cancel_registration(
+		in p_course int,
+		in p_student int
+)
+	language plpgsql
+	as $$
+	begin 
+		update courses set enrolled = enrolled - 1 where course_id = p_course;
+		delete from registrations r where r.course = p_course and r.student = p_student;
+	end;
+$$;	
+
+create or replace procedure update_course(
+		in p_course_id int,
+		in p_course_code varchar(9),
+		in p_course_title varchar(25),
+		in p_capacity smallint,
+		in p_enrolled smallint,
+		in p_professor int
+	)-- p_ for parameter
+	language plpgsql
+	as $$
+	begin 
+		update courses
+		set course_id = p_course_id, 
+			course_code = p_course_code, 
+			course_title = p_course_title,
+			capacity = p_capacity, 
+			enrolled = p_enrolled, 
+			professor = p_professor 
+		where course_id = p_course_id;
+	end;
+$$;
+
+-- CALLS	
+call new_registration(1, 4); 
+call new_registration(1, 5); 
+call new_registration(1, 6); 		
 		
-	
-	
+select c.* 
+from courses c 
+inner join registrations r on c.course_id = r.course
+where r.student = 4;
+
+
+
+
+
+
+
+
+
+
+
 	

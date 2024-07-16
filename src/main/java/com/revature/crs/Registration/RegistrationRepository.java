@@ -17,7 +17,7 @@ public class RegistrationRepository implements Crudable<Registration> {
     public boolean update(Registration updatedRegistration) {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
             String sql = "update registrations " +
-                    "set { registration_id = ?, course = ?, student = ?, registration_date = ?} " +
+                    "set registration_id = ?, course = ?, student = ?, registration_date = ? " +
                     "where registration_id = ?";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, updatedRegistration.getRegistrationId());
@@ -26,8 +26,9 @@ public class RegistrationRepository implements Crudable<Registration> {
             preparedStatement.setDate(4, Date.valueOf(updatedRegistration.getRegistrationDate()));
             preparedStatement.setInt(5, updatedRegistration.getRegistrationId());
 
-            logger.info(preparedStatement.toString());
-            if (preparedStatement.executeUpdate(sql) == 0) throw new RuntimeException("Course not found.");
+            logger.info("updating info to: {}", updatedRegistration);
+            logger.info("SQL: {}", preparedStatement);
+            if (preparedStatement.executeUpdate() == 0) throw new RuntimeException("Registration record not found.");
             else return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -38,15 +39,24 @@ public class RegistrationRepository implements Crudable<Registration> {
     @Override
     public boolean delete(int id) {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
-            String sql = "delete * from registrations where registration_id = ?";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setInt(1, id);
-
-            logger.info(preparedStatement.toString());
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (!resultSet.next()) throw new DataNotFoundException("Registration record not found.");
-            return true;
+            CallableStatement callableStatement = conn.prepareCall("call cancel_registration( ?, ? );");
+            callableStatement.setInt(1, id);
+            callableStatement.setInt(2, id);
+            //TODO fix this whole call statement
+            logger.info("SQL: ", callableStatement);
+            callableStatement.execute();
+            callableStatement.close();
+            return false;
+            //TODO: uhhh do something about this
+//            String sql = "delete * from registrations where registration_id = ?";
+//            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+//            preparedStatement.setInt(1, id);
+//
+//            logger.info("SQL: {}", preparedStatement);
+//            ResultSet resultSet = preparedStatement.executeQuery();
+//
+//            if (!resultSet.next()) throw new DataNotFoundException("Registration record not found.");
+//            return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -59,10 +69,14 @@ public class RegistrationRepository implements Crudable<Registration> {
             List<Registration> registrations = new ArrayList<>();
             String sql = "select * from registrations";
 
-            logger.info(sql);
+            logger.info("SQL: {}", sql);
             ResultSet resultSet = conn.createStatement().executeQuery(sql);
 
-            while (resultSet.next()) registrations.add(generateRegistrationFromResultSet(resultSet));
+            while (resultSet.next()) {
+                Registration foundRegistration = generateRegistrationFromResultSet(resultSet);
+                logger.info("found Registration: {}", foundRegistration);
+                registrations.add(foundRegistration);
+            }
             return registrations;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -73,19 +87,23 @@ public class RegistrationRepository implements Crudable<Registration> {
     @Override
     public Registration create(Registration newRegistration) throws InvalidInputException {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
-            String sql = "insert into registrations values (default,?,?,?)";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setInt(1, newRegistration.getCourseId());
-            preparedStatement.setInt(2, newRegistration.getStudentId());
-            preparedStatement.setDate(3, Date.valueOf(newRegistration.getRegistrationDate()));
+            CallableStatement callableStatement = conn.prepareCall("call new_registration( ?, ? );");
+            callableStatement.setInt(1, newRegistration.getCourseId());
+            callableStatement.setInt(2, newRegistration.getStudentId());
 
-            logger.info(preparedStatement.toString());
-            if (preparedStatement.executeUpdate() == 0) {
-                logger.warn("registration: {} not added");
-                throw new RuntimeException("Registration was unable to be added");
-            }
-            logger.info("registration: {} added");
-            return newRegistration;
+            logger.info("SQL: ", callableStatement);
+            callableStatement.execute();
+            callableStatement.close();
+            return null;//TODO: uhhh do something about this
+//
+//            String sql = "select * from registrations where registration_id = ?";
+//            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+//            preparedStatement.setInt(1, registrationId);
+//
+//            logger.info("SQL: {}", preparedStatement);
+//            ResultSet resultSet = preparedStatement.executeQuery();
+//            if (!resultSet.next()) throw new InvalidInputException("Registration not properly saved");
+//            return generateRegistrationFromResultSet(resultSet);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -98,6 +116,8 @@ public class RegistrationRepository implements Crudable<Registration> {
             String sql = "select * from registrations where registration_id = ?";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, id);
+
+            logger.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (!resultSet.next()) throw new DataNotFoundException("Registration record not found.");
             return generateRegistrationFromResultSet(resultSet);
@@ -110,8 +130,8 @@ public class RegistrationRepository implements Crudable<Registration> {
     public Registration generateRegistrationFromResultSet(ResultSet resultSet) throws SQLException {
         Registration registration = new Registration();
         registration.setRegistrationId(resultSet.getInt("registration_id"));
-        registration.setRegistrationId(resultSet.getInt("course"));
-        registration.setRegistrationId(resultSet.getInt("student"));
+        registration.setCourseId(resultSet.getInt("course"));
+        registration.setStudentId(resultSet.getInt("student"));
         registration.setRegistrationDate(resultSet.getDate("registration_date").toLocalDate());
         return registration;
     }

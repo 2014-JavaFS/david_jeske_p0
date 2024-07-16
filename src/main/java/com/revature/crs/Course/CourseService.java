@@ -23,14 +23,9 @@ public class CourseService implements Serviceable<Course> {
     }
 
     @Override
-    public Course create(Course newCourse) {
-        try {
-            validateCourse(newCourse);
-            return courseRepository.create(newCourse);
-        } catch (InvalidInputException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public Course create(Course newCourse) throws InvalidInputException {
+        validateCourse(newCourse);
+        return courseRepository.create(newCourse);
     }
 
     @Override
@@ -46,6 +41,9 @@ public class CourseService implements Serviceable<Course> {
         return courseRepository.update(course);
     }
 
+    public boolean delete(int id) {
+        return courseRepository.delete(id);
+    }
 
     private void validateCourse(Course course) throws InvalidInputException {
         logger.info("validating course: {}", course);
@@ -60,5 +58,19 @@ public class CourseService implements Serviceable<Course> {
             throw new InvalidInputException("Malformed course code");
         }
         //TODO: other criteria
+    }
+
+    public List<Course> findAvailable() {
+        List<Course> courses = courseRepository.findAvailable();
+        logger.info("Searching for available courses");
+        if (courses.isEmpty()) throw new DataNotFoundException("No Courses Found.");
+        else return courses;
+    }
+
+    public List<Course> findEnrolled(int curUser) {
+        List<Course> courses = courseRepository.getEnrolled(curUser);
+        logger.info("searching for user: {}'s enrolled courses", curUser);
+        if (courses.isEmpty()) throw new DataNotFoundException("No Courses Found.");
+        else return courses;
     }
 }

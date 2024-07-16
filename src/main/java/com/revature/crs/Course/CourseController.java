@@ -6,12 +6,13 @@ import com.revature.crs.util.interfaces.Controller;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static com.revature.crs.util.CourseRegistrationFrontController.logger;
-
 public class CourseController implements Controller {
+    private static final Logger log = LoggerFactory.getLogger(CourseController.class);
     private final CourseService courseService;
 
     public CourseController(CourseService courseService) {
@@ -23,8 +24,11 @@ public class CourseController implements Controller {
     public void registerPaths(Javalin app) {
         app.get("/courses", this::getAllCourses);
         app.post("/courses", this::postNewCourse);
+        app.get("/courses/available", this::getAvailableCourses);
+        app.get("/courses/enrolled", this::getEnrolledCourses);
         app.get("/courses/{course_id}", this::getCourseById); //Path Parameter
         app.put("/courses", this::putUpdateCourse);
+        app.delete("/courses/{course_id}", this::deleteCourse);
     }
 
     public void getAllCourses(Context ctx) {
@@ -32,47 +36,86 @@ public class CourseController implements Controller {
         ctx.json(courses);
     }
 
-    public void postNewCourse(Context ctx) {
+    public void postNewCourse(Context ctx) throws InvalidInputException {
         boolean isFaculty = Boolean.valueOf(ctx.header("isFaculty"));
-        logger.info("isFaculty from header: {}", isFaculty);
-        //TODO change this back to actually check if user is faculty
+        log.info("isFaculty from header: {}", isFaculty);
         if (isFaculty) {
-            logger.info("logged in user is not faculty");
-            ctx.status(403);
-            ctx.result("You do not have permission to create a new course.");
+            log.info("logged in user is faculty, creating Course...");
+            Course course = ctx.bodyAsClass(Course.class);
+            ctx.json(courseService.create(course));
+            ctx.status(HttpStatus.CREATED);
             return;
         }
-        logger.info("logged in user is faculty, creating Course...");
-        Course course = ctx.bodyAsClass(Course.class);
-        ctx.json(courseService.create(course));
-        ctx.status(HttpStatus.CREATED);
+        log.info("logged in user is not faculty");
+        ctx.status(403);
+        ctx.result("You do not have permission to create a new course.");
     }
 
     public void getCourseById(Context ctx) {
-        int courseID = Integer.parseInt(ctx.pathParam("course_id"));
-        logger.info("Course number {} was sent through path parameter");
-        try{
-            Course courseFound = courseService.findById(courseID);
-            logger.info("Course to be returned: {}", courseFound);
+        int courseId = Integer.parseInt(ctx.pathParam("course_id"));
+        log.info("CourseId: {} was sent through path parameter", courseId);
+        try {
+            Course courseFound = courseService.findById(courseId);
+            log.info("Course to be returned: {}", courseFound);
             ctx.json(courseFound);
-        } catch (DataNotFoundException e){
-            logger.warn("Information for courseID {} was not found", courseID);
-        } catch (RuntimeException e){
-            logger.warn("Unexpected runtime exception");
+        } catch (DataNotFoundException e) {
+            log.warn("Information for courseId: {} was not found", courseId);
+        } catch (RuntimeException e) {
+            log.warn("Unexpected runtime exception");
         }
-
     }
 
     public void putUpdateCourse(Context ctx) {
         Course updatedCourse = ctx.bodyAsClass(Course.class);
-        try {
-            if (courseService.update(updatedCourse)) {
-                ctx.status(HttpStatus.ACCEPTED);
-            } else {
-                ctx.status(HttpStatus.BAD_REQUEST);
+        boolean isFaculty = Boolean.valueOf(ctx.header("isFaculty"));
+        log.info("isFaculty from header: {}", isFaculty);
+        if (isFaculty) {
+            try {
+                if (courseService.update(updatedCourse)) {
+                    ctx.status(HttpStatus.ACCEPTED);
+                } else {
+                    ctx.status(HttpStatus.BAD_REQUEST);
+                }
+            } catch (InvalidInputException e) {
+                e.printStackTrace();
             }
-        } catch (InvalidInputException e) {
-            e.printStackTrace();
+            return;
+
         }
+        log.info("logged in user is not faculty");
+        ctx.status(403);
+        ctx.result("You do not have permission to update course info.");
     }
+
+    public void deleteCourse(Context ctx) {
+        int courseId = Integer.parseInt(ctx.pathParam("course_id"));
+        log.info("CourseId: {} was sent through path parameter", courseId);
+        boolean isFaculty = Boolean.valueOf(ctx.header("isFaculty"));
+        log.info("isFaculty from header: {}", isFaculty);
+        if (isFaculty) {
+            try {
+                courseService.delete(courseId);
+            } catch (DataNotFoundException e) {
+                log.warn("courseId: {} was not found, could not be deleted", courseId);
+            } catch (RuntimeException e) {
+                log.warn("Unexpected runtime exception encountered during attempted deletion");
+            }
+            return;
+        }
+        log.info("logged in user is not faculty");
+        ctx.status(403);
+        ctx.result("You do not have permission to delete a course.");
+    }
+
+    public void getAvailableCourses(Context ctx) {
+        List<Course> courses = courseService.findAvailable();
+        ctx.json(courses);
+    }
+
+    public void getEnrolledCourses(Context ctx) {
+        int curUser = Integer.parseInt(ctx.header("currentUserId"));
+        List<Course> courses = courseService.findEnrolled(curUser);
+        ctx.json(courses);
+    }
+
 }

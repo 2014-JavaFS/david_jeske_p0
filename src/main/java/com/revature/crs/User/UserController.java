@@ -5,10 +5,13 @@ import com.revature.crs.util.interfaces.Controller;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class UserController implements Controller {
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -28,7 +31,7 @@ public class UserController implements Controller {
         ctx.json(users);
     }
 
-    public void postNewUser(Context ctx) {
+    public void postNewUser(Context ctx) throws InvalidInputException {
         //TODO restrict to unlogged-in users? only for registering new account?
         User user = ctx.bodyAsClass(User.class);
         ctx.json(userService.create(user));

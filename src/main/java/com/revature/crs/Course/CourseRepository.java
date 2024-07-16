@@ -4,10 +4,7 @@ import com.revature.crs.util.ConnectionFactory;
 import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.interfaces.Crudable;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,21 +15,22 @@ public class CourseRepository implements Crudable<Course> {
     @Override
     public boolean update(Course updatedCourse) {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
-            String sql = "update courses " +
-                    "set { course_id = ?, course_code = ?, course_title = ?," +
-                    " capacity = ?, enrolled = ?, professor = ? } where course_id = ?";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setInt(1, updatedCourse.getCourseId());
-            preparedStatement.setString(2, updatedCourse.getCourseCode());
-            preparedStatement.setString(3, updatedCourse.getCourseTitle());
-            preparedStatement.setShort(4, updatedCourse.getCapacity());
-            preparedStatement.setShort(5, updatedCourse.getEnrolled());
-            preparedStatement.setInt(6, updatedCourse.getProfessor());
-            preparedStatement.setInt(7, updatedCourse.getCourseId());
+            CallableStatement callableStatement = conn.prepareCall("call update_course(?,?,?,?,?,?)");
+            callableStatement.setInt(1, updatedCourse.getCourseId());
+            callableStatement.setString(2, updatedCourse.getCourseCode());
+            callableStatement.setString(3, updatedCourse.getCourseTitle());
+            callableStatement.setShort(4, updatedCourse.getCapacity());
+            callableStatement.setShort(5, updatedCourse.getEnrolled());
+            callableStatement.setInt(6, updatedCourse.getProfessor());
 
-            logger.info(preparedStatement.toString());
-            if (preparedStatement.executeUpdate(sql) == 0) throw new RuntimeException("Course not found.");
-            else return true;
+            logger.info("SQL: {}", callableStatement);
+            callableStatement.execute();
+            callableStatement.close();
+
+            return true;
+            //TODO: uhhh maybe do something about this?
+//            if (preparedStatement.executeUpdate() == 0) throw new RuntimeException("Course not found.");
+//            else return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -42,11 +40,11 @@ public class CourseRepository implements Crudable<Course> {
     @Override
     public boolean delete(int courseId) {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
-            String sql = "delete * from courses where course_id = ?";
+            String sql = "delete from courses where course_id = ?";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, courseId);
 
-            logger.info(preparedStatement.toString());
+            logger.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) throw new DataNotFoundException("Course not found.");
@@ -63,7 +61,7 @@ public class CourseRepository implements Crudable<Course> {
             List<Course> courses = new ArrayList<>();
             String sql = "select * from courses";
 
-            logger.info(sql);
+            logger.info("SQL: {}", sql);
             ResultSet resultSet = conn.createStatement().executeQuery(sql);
 
             while (resultSet.next()) courses.add(generateCourseFromResultSet(resultSet));
@@ -85,12 +83,12 @@ public class CourseRepository implements Crudable<Course> {
             preparedStatement.setShort(4, newCourse.getEnrolled());
             preparedStatement.setInt(5, newCourse.getProfessor());
 
-            logger.info(preparedStatement.toString());
+            logger.info("SQL: {}", preparedStatement);
             if (preparedStatement.executeUpdate() == 0) {
-                logger.warn("course: {} not added");
+                logger.warn("course: {} not added", newCourse);
                 throw new RuntimeException("Course not added");
             }
-            logger.info("course: {} added");
+            logger.info("course: {} added", newCourse);
             return newCourse;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -105,7 +103,7 @@ public class CourseRepository implements Crudable<Course> {
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, id);
 
-            logger.info(preparedStatement.toString());
+            logger.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) {
@@ -115,6 +113,42 @@ public class CourseRepository implements Crudable<Course> {
             Course foundCourse = generateCourseFromResultSet(resultSet);
             logger.info("returning found course: {}", foundCourse);
             return foundCourse;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<Course> findAvailable() {
+        try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
+            List<Course> courses = new ArrayList<>();
+            String sql = "select * from courses where enrolled < capacity";
+
+            logger.info("SQL: {}", sql);
+            ResultSet resultSet = conn.createStatement().executeQuery(sql);
+
+            while (resultSet.next()) courses.add(generateCourseFromResultSet(resultSet));
+            return courses;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<Course> getEnrolled(int curUser) {
+        try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
+            List<Course> courses = new ArrayList<>();
+            String sql = "select c.* from courses " +
+                    "inner join registrations r on c.course_id = r.course " +
+                    "where r.student = ? ;";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setInt(1, curUser);
+
+            logger.info("SQL: {}", preparedStatement);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) courses.add(generateCourseFromResultSet(resultSet));
+            return courses;
         } catch (SQLException e) {
             e.printStackTrace();
             return null;

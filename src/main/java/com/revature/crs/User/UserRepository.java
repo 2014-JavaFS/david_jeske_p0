@@ -19,7 +19,7 @@ public class UserRepository implements Crudable<User> {
     public boolean update(User updatedUser) {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
             String sql = "update users " +
-                    "set { first_name = ?, last_name = ?, email = ?, password = ?, is_faculty = ? } " +
+                    "set first_name = ?, last_name = ?, email = ?, password = ?, is_faculty = ? " +
                     "where user_id = ?";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setString(1, updatedUser.getFirstName());
@@ -29,8 +29,8 @@ public class UserRepository implements Crudable<User> {
             preparedStatement.setBoolean(5, updatedUser.isFaculty());
             preparedStatement.setInt(6, updatedUser.getUserID());
 
-            logger.info(preparedStatement.toString());
-            if (preparedStatement.executeUpdate(sql) == 0) throw new RuntimeException("User not found.");
+            logger.info("SQL: {}", preparedStatement);
+            if (preparedStatement.executeUpdate() == 0) throw new RuntimeException("User not found.");
             else return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -45,7 +45,7 @@ public class UserRepository implements Crudable<User> {
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, userId);
 
-            logger.info(preparedStatement.toString());
+            logger.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) throw new DataNotFoundException("No user found.");
@@ -62,7 +62,7 @@ public class UserRepository implements Crudable<User> {
             List<User> users = new ArrayList<>();
             String sql = "select * from users";
 
-            logger.info(sql);
+            logger.info("SQL: {}", sql);
             ResultSet resultSet = conn.createStatement().executeQuery(sql);
 
             while (resultSet.next()) users.add(generateUserFromResultSet(resultSet));
@@ -83,8 +83,8 @@ public class UserRepository implements Crudable<User> {
             preparedStatement.setString(4, newUser.getPassword());
             preparedStatement.setBoolean(5, newUser.isFaculty());
 
-            logger.info(preparedStatement.toString());
-            if (preparedStatement.executeUpdate(sql) == 0) throw new RuntimeException("User not added.");
+            logger.info("SQL: {}", preparedStatement);
+            if (preparedStatement.executeUpdate() == 0) throw new RuntimeException("User not added.");
             return newUser;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -99,7 +99,7 @@ public class UserRepository implements Crudable<User> {
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, id);
 
-            logger.info(preparedStatement.toString());
+            logger.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) throw new DataNotFoundException("No user found.");
@@ -117,7 +117,7 @@ public class UserRepository implements Crudable<User> {
             preparedStatement.setString(1, email);
             preparedStatement.setString(2, password);
 
-            logger.info(preparedStatement.toString());
+            logger.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) throw new DataNotFoundException("Incorrect Email or Password");

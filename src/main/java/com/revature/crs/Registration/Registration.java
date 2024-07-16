@@ -15,13 +15,6 @@ public class Registration {
         this.registrationDate = registrationDate;
     }
 
-    public Registration(int registrationId, int courseId, int studentId) {
-        this.registrationId = registrationId;
-        this.courseId = courseId;
-        this.studentId = studentId;
-        this.registrationDate = LocalDate.now();
-    }
-
     public Registration() {
     }
 
@@ -61,9 +54,9 @@ public class Registration {
 
     @Override
     public String toString() {
-        return ("RegisID: " + registrationId +
-                ", courseID: " + courseId +
-                ", studentID: " + studentId +
-                ", record made: " + registrationDate.toString());
+        return ("registrationId: " + registrationId +
+                ", courseId: " + courseId +
+                ", studentId: " + studentId +
+                ", date: " + registrationDate.toString());
     }
 }

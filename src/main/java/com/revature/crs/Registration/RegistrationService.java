@@ -4,6 +4,7 @@ import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.exceptions.InvalidInputException;
 import com.revature.crs.util.interfaces.Serviceable;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class RegistrationService implements Serviceable<Registration> {
@@ -21,14 +22,8 @@ public class RegistrationService implements Serviceable<Registration> {
     }
 
     @Override
-    public Registration create(Registration newRegistration) {
-        try {
-            validateRegistration(newRegistration);
-            return newRegistration;
-        } catch (InvalidInputException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public Registration create(Registration newRegistration) throws InvalidInputException {
+            return registrationRepository.create(newRegistration);
     }
 
     @Override
@@ -41,12 +36,14 @@ public class RegistrationService implements Serviceable<Registration> {
         return registrationRepository.update(updatedRegistration);
     }
 
-    public void validateRegistration(Registration registration) throws InvalidInputException {
+    private void validateRegistration(Registration registration) throws InvalidInputException {
         if (registration == null) throw new InvalidInputException("User is null and not instantiated");
-        if (registration.getRegistrationId() <= 0) throw new InvalidInputException("no registrationID");
-        if (registration.getCourseId() <= 0) throw new InvalidInputException("no courseID");
-        if (registration.getStudentId() <= 0) throw new InvalidInputException("no studentID");
-        if (registration.getRegistrationDate() == null) throw new InvalidInputException("no registrationDate");
-        //TODO: maybe flesh this out more
+        if (registration.getCourseId() <= 0) throw new InvalidInputException("invalid courseID");
+        if (registration.getStudentId() <= 0) throw new InvalidInputException("invalid studentID");
+        //TODO: maybe flesh this out more?
+    }
+
+    public boolean delete(int id) {
+        return registrationRepository.delete(id);
     }
 }

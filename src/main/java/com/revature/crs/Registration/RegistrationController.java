@@ -5,10 +5,15 @@ import com.revature.crs.util.interfaces.Controller;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.util.List;
 
+
 public class RegistrationController implements Controller {
+    private static final Logger log = LoggerFactory.getLogger(RegistrationController.class);
     private final RegistrationService registrationService;
 
     public RegistrationController(RegistrationService registrationService) {
@@ -18,20 +23,28 @@ public class RegistrationController implements Controller {
     @Override
     public void registerPaths(Javalin app) {
         app.get("/registrations", this::getAllRegistrations);
-        app.post("/registrations", this::postNewUser);
+        app.post("/registrations/", this::postNewRegistration);
         app.get("/registrations/{registration_id}", this::getRegistrationById);
         app.put("/registrations", this::putUpdateRegistration);
+        app.delete("/registrations/cancel/{registration_id}", this::deleteRegistration);
     }
 
     public void getAllRegistrations(Context ctx) {
         List<Registration> registrations = registrationService.findAll();
         ctx.json(registrations);
     }
-    
-    public void postNewUser(Context ctx) {
-        Registration registration = ctx.bodyAsClass(Registration.class);
-        ctx.json(registrationService.create(registration));
-        ctx.status(HttpStatus.CREATED);
+
+    public void postNewRegistration(Context ctx) throws InvalidInputException {
+        int courseId = Integer.parseInt(ctx.queryParam("courseId"));
+        int studentId = Integer.parseInt(ctx.header("currentUserId"));
+        boolean isFaculty = Boolean.parseBoolean(ctx.header("isFaculty"));
+        log.info("path param courseId: {}", courseId);
+        log.info("header info isFaculty: {}; studentId: {}", isFaculty, studentId);
+
+        if (!isFaculty) {
+            log.info("studentId: {} is registering for courseId: {}", studentId, courseId);
+            registrationService.create(new Registration(0, courseId, studentId, LocalDate.now()));
+        }
     }
 
     public void getRegistrationById(Context ctx) {
@@ -51,5 +64,11 @@ public class RegistrationController implements Controller {
         } catch (InvalidInputException e) {
             e.printStackTrace();
         }
+    }
+
+    public void deleteRegistration(Context ctx) {
+        int registrationId = Integer.parseInt(ctx.pathParam("registration_id"));
+        registrationService.delete(registrationId);
+        log.info("registration deleted");
     }
 }
