@@ -7,15 +7,15 @@ A Course Registration System for both students and faculty.
 
 As any kind of user, I can:
 
--   [X] login with my existing credentials
+-   [x] login with my existing credentials
 
-As a faculty member I can:
+### As a faculty member I can:
 
--   [X] add new classes to the registration catalog
--   [X] change the registration details for a class
--   [X] remove a class from the registration catalog (this should unregister all registered students)
+-   [x] add new classes to the registration catalog
+-   [x] change the registration details for a class
+-   [x] remove a class from the registration catalog (this should unregister all registered students)
 
-As a student, I can:
+### As a student, I can:
 
 -   [X] register a new account with the system (must be secured with a password)
 -   [X] view classes available for registration
