@@ -56,8 +56,8 @@ create or replace procedure new_registration(
 		in p_course int,
 		in p_student int
 )
-	language plpgsql
-	as $$
+language plpgsql
+as $$
 	begin 
 		insert into registrations values (default, p_course, p_student, default);
 		update courses set enrolled = enrolled + 1 where course_id = p_course;
@@ -65,16 +65,23 @@ create or replace procedure new_registration(
 $$;
 
 create or replace procedure cancel_registration(
-		in p_course int,
-		in p_student int
+		in p_registration_id int
 )
-	language plpgsql
-	as $$
+language plpgsql
+as $$
+	declare var_course_id int;	
 	begin 
-		update courses set enrolled = enrolled - 1 where course_id = p_course;
-		delete from registrations r where r.course = p_course and r.student = p_student;
+		var_course_id := (
+			select course from registrations r
+			where p_registration_id = r.registration_id);
+		
+		update courses set enrolled = enrolled - 1
+		where course_id = var_course_id;
+		
+		delete from registrations r
+		where r.registration_id = p_registration_id;
 	end;
-$$;	
+$$;
 
 create or replace procedure update_course(
 		in p_course_id int,
@@ -100,14 +107,16 @@ $$;
 
 -- CALLS	
 call new_registration(1, 4); 
-call new_registration(1, 5); 
-call new_registration(1, 6); 		
+call new_registration(1, 5);
+call new_registration(1, 6); 
+call new_registration(2, 6); 
+call new_registration(3, 6); 
+call new_registration(4, 6); 
+call new_registration(5, 6);  	
 		
-select c.* 
-from courses c 
-inner join registrations r on c.course_id = r.course
-where r.student = 4;
-
+--select * from courses;
+--select * from users;
+--select * from registrations;
 
 
 

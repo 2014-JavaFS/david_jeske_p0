@@ -45,6 +45,20 @@ public class CourseService implements Serviceable<Course> {
         return courseRepository.delete(id);
     }
 
+    public List<Course> findAvailable() {
+        List<Course> courses = courseRepository.findAvailable();
+        logger.info("Searching for available courses");
+        if (courses.isEmpty()) throw new DataNotFoundException("No Courses Found.");
+        else return courses;
+    }
+
+    public List<Course> findEnrolled(int curUser) {
+        List<Course> courses = courseRepository.getEnrolled(curUser);
+        logger.info("searching for user: {}'s enrolled courses", curUser);
+        if (courses.isEmpty()) throw new DataNotFoundException("No Courses Found.");
+        else return courses;
+    }
+
     private void validateCourse(Course course) throws InvalidInputException {
         logger.info("validating course: {}", course);
         if (course == null) throw new InvalidInputException("course is null, has not been instantiated");
@@ -58,19 +72,5 @@ public class CourseService implements Serviceable<Course> {
             throw new InvalidInputException("Malformed course code");
         }
         //TODO: other criteria
-    }
-
-    public List<Course> findAvailable() {
-        List<Course> courses = courseRepository.findAvailable();
-        logger.info("Searching for available courses");
-        if (courses.isEmpty()) throw new DataNotFoundException("No Courses Found.");
-        else return courses;
-    }
-
-    public List<Course> findEnrolled(int curUser) {
-        List<Course> courses = courseRepository.getEnrolled(curUser);
-        logger.info("searching for user: {}'s enrolled courses", curUser);
-        if (courses.isEmpty()) throw new DataNotFoundException("No Courses Found.");
-        else return courses;
     }
 }

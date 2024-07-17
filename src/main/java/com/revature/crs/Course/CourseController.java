@@ -28,7 +28,7 @@ public class CourseController implements Controller {
         app.get("/courses/enrolled", this::getEnrolledCourses);
         app.get("/courses/{course_id}", this::getCourseById); //Path Parameter
         app.put("/courses", this::putUpdateCourse);
-        app.delete("/courses/{course_id}", this::deleteCourse);
+        app.delete("/courses/delete", this::deleteCourse);
     }
 
     public void getAllCourses(Context ctx) {
@@ -73,6 +73,7 @@ public class CourseController implements Controller {
             try {
                 if (courseService.update(updatedCourse)) {
                     ctx.status(HttpStatus.ACCEPTED);
+                    ctx.result("updated course: " + updatedCourse);
                 } else {
                     ctx.status(HttpStatus.BAD_REQUEST);
                 }
@@ -88,13 +89,15 @@ public class CourseController implements Controller {
     }
 
     public void deleteCourse(Context ctx) {
-        int courseId = Integer.parseInt(ctx.pathParam("course_id"));
-        log.info("CourseId: {} was sent through path parameter", courseId);
+        int courseId = Integer.parseInt(ctx.queryParam("course_id"));
+        log.info("path info course_id:{}", courseId);
         boolean isFaculty = Boolean.valueOf(ctx.header("isFaculty"));
-        log.info("isFaculty from header: {}", isFaculty);
+        log.info("header info isFaculty:{}", isFaculty);
         if (isFaculty) {
             try {
                 courseService.delete(courseId);
+                ctx.status(200);
+                ctx.result("deleted courseId: " + courseId);
             } catch (DataNotFoundException e) {
                 log.warn("courseId: {} was not found, could not be deleted", courseId);
             } catch (RuntimeException e) {
@@ -114,6 +117,18 @@ public class CourseController implements Controller {
 
     public void getEnrolledCourses(Context ctx) {
         int curUser = Integer.parseInt(ctx.header("currentUserId"));
+        boolean isFaculty = Boolean.valueOf(ctx.header("isFaculty"));
+        log.info("Header info, isFaculty:{}, currentUserId:{}", isFaculty, curUser);
+        if (!isFaculty) {
+            try {
+                courseService.findEnrolled(curUser);
+            } catch (DataNotFoundException e) {
+                log.warn("User has no enrolled courses");
+                ctx.status(404);
+                ctx.result("You don't have any enrolled courses");
+                return;
+            }
+        }
         List<Course> courses = courseService.findEnrolled(curUser);
         ctx.json(courses);
     }

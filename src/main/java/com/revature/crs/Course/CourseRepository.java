@@ -45,10 +45,9 @@ public class CourseRepository implements Crudable<Course> {
             preparedStatement.setInt(1, courseId);
 
             logger.info("SQL: {}", preparedStatement);
-            ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (!resultSet.next()) throw new DataNotFoundException("Course not found.");
-            return true;
+            if (preparedStatement.executeUpdate() == 0) throw new DataNotFoundException("Course not found.");
+            else return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -138,7 +137,7 @@ public class CourseRepository implements Crudable<Course> {
     public List<Course> getEnrolled(int curUser) {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
             List<Course> courses = new ArrayList<>();
-            String sql = "select c.* from courses " +
+            String sql = "select c.* from courses c " +
                     "inner join registrations r on c.course_id = r.course " +
                     "where r.student = ? ;";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);

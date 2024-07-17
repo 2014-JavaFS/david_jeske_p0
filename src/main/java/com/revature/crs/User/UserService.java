@@ -4,6 +4,7 @@ import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.exceptions.InvalidInputException;
 import com.revature.crs.util.interfaces.Serviceable;
 
+import javax.security.sasl.AuthenticationException;
 import java.util.List;
 
 import static com.revature.crs.util.CourseRegistrationFrontController.logger;
@@ -36,7 +37,7 @@ public class UserService implements Serviceable<User> {
         return userFound;
     }
 
-    public User findByLogin(String email, String password) {
+    public User findByLogin(String email, String password) throws AuthenticationException {
         logger.info("user attempting log in with email: {}", email);
         return userRepository.findByLogin(email, password);
     }

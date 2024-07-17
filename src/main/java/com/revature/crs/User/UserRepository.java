@@ -4,6 +4,7 @@ import com.revature.crs.util.ConnectionFactory;
 import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.interfaces.Crudable;
 
+import javax.security.sasl.AuthenticationException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -110,7 +111,7 @@ public class UserRepository implements Crudable<User> {
         }
     }
 
-    public User findByLogin(String email, String password) {
+    public User findByLogin(String email, String password) throws AuthenticationException {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
             String sql = "select * from users where email like ? and password like ?";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
@@ -120,7 +121,7 @@ public class UserRepository implements Crudable<User> {
             logger.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (!resultSet.next()) throw new DataNotFoundException("Incorrect Email or Password");
+            if (!resultSet.next()) throw new AuthenticationException("Incorrect Email or Password");
             return generateUserFromResultSet(resultSet);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -136,7 +137,7 @@ public class UserRepository implements Crudable<User> {
         user.setEmail(resultSet.getString("email"));
         //user.setPassword(resultSet.getString("password"));
         //to not have user's password get out of database, not sure if this breaks anything
-        //TODO: ^^^test that
+        //TODO: ^^^test that <- seems fine
         user.setFaculty(resultSet.getBoolean("is_faculty"));
         return user;
     }

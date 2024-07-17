@@ -1,5 +1,6 @@
 package com.revature.crs.Registration;
 
+import com.revature.crs.Course.Course;
 import com.revature.crs.util.ConnectionFactory;
 import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.exceptions.InvalidInputException;
@@ -39,10 +40,8 @@ public class RegistrationRepository implements Crudable<Registration> {
     @Override
     public boolean delete(int id) {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
-            CallableStatement callableStatement = conn.prepareCall("call cancel_registration( ?, ? );");
+            CallableStatement callableStatement = conn.prepareCall("call cancel_registration(?);");
             callableStatement.setInt(1, id);
-            callableStatement.setInt(2, id);
-            //TODO fix this whole call statement
             logger.info("SQL: ", callableStatement);
             callableStatement.execute();
             callableStatement.close();
@@ -69,14 +68,9 @@ public class RegistrationRepository implements Crudable<Registration> {
             List<Registration> registrations = new ArrayList<>();
             String sql = "select * from registrations";
 
-            logger.info("SQL: {}", sql);
             ResultSet resultSet = conn.createStatement().executeQuery(sql);
 
-            while (resultSet.next()) {
-                Registration foundRegistration = generateRegistrationFromResultSet(resultSet);
-                logger.info("found Registration: {}", foundRegistration);
-                registrations.add(foundRegistration);
-            }
+            while (resultSet.next()) registrations.add(generateRegistrationFromResultSet(resultSet));
             return registrations;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -90,20 +84,10 @@ public class RegistrationRepository implements Crudable<Registration> {
             CallableStatement callableStatement = conn.prepareCall("call new_registration( ?, ? );");
             callableStatement.setInt(1, newRegistration.getCourseId());
             callableStatement.setInt(2, newRegistration.getStudentId());
-
-            logger.info("SQL: ", callableStatement);
             callableStatement.execute();
             callableStatement.close();
-            return null;//TODO: uhhh do something about this
-//
-//            String sql = "select * from registrations where registration_id = ?";
-//            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-//            preparedStatement.setInt(1, registrationId);
-//
-//            logger.info("SQL: {}", preparedStatement);
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//            if (!resultSet.next()) throw new InvalidInputException("Registration not properly saved");
-//            return generateRegistrationFromResultSet(resultSet);
+            return null;
+            //TODO: probably shouldnt be just returning a null but uhhhhhh it works?
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -121,6 +105,26 @@ public class RegistrationRepository implements Crudable<Registration> {
             ResultSet resultSet = preparedStatement.executeQuery();
             if (!resultSet.next()) throw new DataNotFoundException("Registration record not found.");
             return generateRegistrationFromResultSet(resultSet);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<Registration> getEnrolled(int curUser) {
+        try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
+            List<Registration> registrations = new ArrayList<>();
+            String sql = "select r.* from registrations r " +
+                    "inner join users u on u.user_id = r.student " +
+                    "where r.student = ? ;";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setInt(1, curUser);
+
+            logger.info("SQL: {}", preparedStatement);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) registrations.add(generateRegistrationFromResultSet(resultSet));
+            return registrations;
         } catch (SQLException e) {
             e.printStackTrace();
             return null;

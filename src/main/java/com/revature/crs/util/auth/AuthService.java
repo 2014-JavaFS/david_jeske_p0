@@ -3,7 +3,7 @@ package com.revature.crs.util.auth;
 import com.revature.crs.User.User;
 import com.revature.crs.User.UserService;
 
-import javax.naming.AuthenticationException;
+import javax.security.sasl.AuthenticationException;
 
 public class AuthService {
 

@@ -32,10 +32,14 @@ public class UserController implements Controller {
     }
 
     public void postNewUser(Context ctx) throws InvalidInputException {
-        //TODO restrict to unlogged-in users? only for registering new account?
-        User user = ctx.bodyAsClass(User.class);
-        ctx.json(userService.create(user));
-        ctx.status(HttpStatus.CREATED);
+        boolean notLoggedOn = ctx.header("currentUserId") == null;
+        if (notLoggedOn) {
+            User user = ctx.bodyAsClass(User.class);
+            ctx.json(userService.create(user));
+            ctx.status(HttpStatus.CREATED);
+        } else {
+            ctx.status(418);
+        }
     }
 
     public void getUserById(Context ctx) {

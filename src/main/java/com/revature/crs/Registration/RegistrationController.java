@@ -1,5 +1,7 @@
 package com.revature.crs.Registration;
 
+import com.revature.crs.Course.Course;
+import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.exceptions.InvalidInputException;
 import com.revature.crs.util.interfaces.Controller;
 import io.javalin.Javalin;
@@ -23,10 +25,11 @@ public class RegistrationController implements Controller {
     @Override
     public void registerPaths(Javalin app) {
         app.get("/registrations", this::getAllRegistrations);
+        app.get("/registrations/enrolled", this::getMyRegistrations);
         app.post("/registrations/", this::postNewRegistration);
         app.get("/registrations/{registration_id}", this::getRegistrationById);
         app.put("/registrations", this::putUpdateRegistration);
-        app.delete("/registrations/cancel/{registration_id}", this::deleteRegistration);
+        app.delete("/registrations/cancel", this::deleteRegistration);
     }
 
     public void getAllRegistrations(Context ctx) {
@@ -44,6 +47,10 @@ public class RegistrationController implements Controller {
         if (!isFaculty) {
             log.info("studentId: {} is registering for courseId: {}", studentId, courseId);
             registrationService.create(new Registration(0, courseId, studentId, LocalDate.now()));
+            ctx.status(402);
+        } else {
+            ctx.status(403);
+            ctx.result("You can not register for a course at this time.");
         }
     }
 
@@ -67,8 +74,36 @@ public class RegistrationController implements Controller {
     }
 
     public void deleteRegistration(Context ctx) {
-        int registrationId = Integer.parseInt(ctx.pathParam("registration_id"));
-        registrationService.delete(registrationId);
-        log.info("registration deleted");
+        int registrationId = Integer.parseInt(ctx.queryParam("registration_id"));
+        log.info("path info registration_id:{}", registrationId);
+        try {
+            registrationService.delete(registrationId);
+            ctx.status(200);
+            ctx.result("cancelled registration");
+        } catch (DataNotFoundException e) {
+            log.warn("registrationId: {} was not found, could not be deleted", registrationId);
+            ctx.status(403);
+            ctx.result("not found try again.");
+        } catch (RuntimeException e) {
+            log.warn("Unexpected runtime exception encountered during attempted deletion");
+        }
+    }
+
+    public void getMyRegistrations(Context ctx) {
+        int curUser = Integer.parseInt(ctx.header("currentUserId"));
+        boolean isFaculty = Boolean.valueOf(ctx.header("isFaculty"));
+        log.info("Header info, isFaculty:{}, currentUserId:{}", isFaculty, curUser);
+        if (!isFaculty) {
+            try {
+                registrationService.findEnrolled(curUser);
+            } catch (DataNotFoundException e) {
+                log.warn("User has no enrolled registrations");
+                ctx.status(404);
+                ctx.result("You don't have any enrolled registrations");
+                return;
+            }
+        }
+        List<Registration> registrations = registrationService.findEnrolled(curUser);
+        ctx.json(registrations);
     }
 }
