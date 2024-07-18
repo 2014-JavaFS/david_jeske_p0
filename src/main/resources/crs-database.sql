@@ -52,10 +52,11 @@ values  (default, 'Sam', 'Smith', 'SamSmith@uni.edu', '123', false),
 		
 	
 -- PROCEDURES
+
 create or replace procedure new_registration(
 		in p_course int,
 		in p_student int
-)
+	)
 language plpgsql
 as $$
 	begin 
@@ -64,9 +65,7 @@ as $$
 	end;
 $$;
 
-create or replace procedure cancel_registration(
-		in p_registration_id int
-)
+create or replace procedure cancel_registration(in p_registration_id int)
 language plpgsql
 as $$
 	declare var_course_id int;	
@@ -105,6 +104,22 @@ create or replace procedure update_course(
 	end;
 $$;
 
+-- FUNCTIONS
+
+/*create or replace function cancel_registration(in p_registration_id int)
+returns boolean
+language plpgsql
+as $$
+	declare var_course_id int;
+	if 	extract(month from (
+			select r.registration_date 
+			from registrations r 
+			where r.registration_id = p_registration_id))
+		
+		
+	
+$$;*/
+	
 -- CALLS	
 call new_registration(1, 4); 
 call new_registration(1, 5);
@@ -112,7 +127,8 @@ call new_registration(1, 6);
 call new_registration(2, 6); 
 call new_registration(3, 6); 
 call new_registration(4, 6); 
-call new_registration(5, 6);  	
+call new_registration(5, 6); 
+call new_registration(6, 6);  	
 		
 --select * from courses;
 --select * from users;

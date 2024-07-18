@@ -32,7 +32,7 @@ public class UserController implements Controller {
     }
 
     public void postNewUser(Context ctx) throws InvalidInputException {
-        boolean notLoggedOn = ctx.header("currentUserId") == null;
+        boolean notLoggedOn = ctx.header("currentUserId").equals("0");
         if (notLoggedOn) {
             User user = ctx.bodyAsClass(User.class);
             ctx.json(userService.create(user));

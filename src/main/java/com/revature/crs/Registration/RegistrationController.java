@@ -1,6 +1,5 @@
 package com.revature.crs.Registration;
 
-import com.revature.crs.Course.Course;
 import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.exceptions.InvalidInputException;
 import com.revature.crs.util.interfaces.Controller;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.List;
-
 
 public class RegistrationController implements Controller {
     private static final Logger log = LoggerFactory.getLogger(RegistrationController.class);
@@ -77,17 +75,27 @@ public class RegistrationController implements Controller {
     public void deleteRegistration(Context ctx) {
         int registrationId = Integer.parseInt(ctx.queryParam("registration_id"));
         log.info("path info registration_id:{}", registrationId);
-        try {
-            if (registrationService.delete(registrationId)) {
-                ctx.result("cancelled registration");
-            }
-            ctx.status(200);
-        } catch (DataNotFoundException e) {
-            log.warn("registrationId: {} was not found, could not be deleted", registrationId);
+
+        int curUser = Integer.parseInt(ctx.header("currentUserId"));
+        boolean isFaculty = Boolean.valueOf(ctx.header("isFaculty"));
+        log.info("Header info, isFaculty:{}, currentUserId:{}", isFaculty, curUser);
+        if (isFaculty || curUser == 0) {
+            ctx.result("Unauthorized users cannot cancel registrations");
             ctx.status(403);
-            ctx.result("not found try again.");
-        } catch (RuntimeException e) {
-            log.warn("Unexpected runtime exception encountered during attempted deletion");
+            log.info("Unauthorized user tried to cancel registration");
+        } else {
+            try {
+                if (registrationService.delete(registrationId)) {
+                    ctx.result("cancelled registration");
+                }
+                ctx.status(200);
+            } catch (DataNotFoundException e) {
+                log.warn("registrationId: {} was not found, could not be deleted", registrationId);
+                ctx.status(403);
+                ctx.result("not found try again.");
+            } catch (RuntimeException e) {
+                log.warn("Unexpected runtime exception encountered during attempted deletion");
+            }
         }
     }
 

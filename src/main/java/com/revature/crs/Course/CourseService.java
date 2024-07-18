@@ -3,12 +3,13 @@ package com.revature.crs.Course;
 import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.exceptions.InvalidInputException;
 import com.revature.crs.util.interfaces.Serviceable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static com.revature.crs.util.CourseRegistrationFrontController.logger;
-
 public class CourseService implements Serviceable<Course> {
+    private static final Logger log = LoggerFactory.getLogger(CourseController.class);
     private CourseRepository courseRepository;
 
     public CourseService(CourseRepository courseRepository) {
@@ -30,9 +31,9 @@ public class CourseService implements Serviceable<Course> {
 
     @Override
     public Course findById(int id) {
-        logger.info("Course request was sent to service with id: {}", id);
+        log.info("Course request was sent to service with id: {}", id);
         Course courseFound = courseRepository.findById(id);
-        logger.info("Course as found: {}", courseFound);
+        log.info("Course as found: {}", courseFound);
         return courseFound;
     }
 
@@ -47,20 +48,20 @@ public class CourseService implements Serviceable<Course> {
 
     public List<Course> findAvailable() {
         List<Course> courses = courseRepository.findAvailable();
-        logger.info("Searching for available courses");
+        log.info("Searching for available courses");
         if (courses.isEmpty()) throw new DataNotFoundException("No Courses Found.");
         else return courses;
     }
 
     public List<Course> findEnrolled(int curUser) {
         List<Course> courses = courseRepository.getEnrolled(curUser);
-        logger.info("searching for user: {}'s enrolled courses", curUser);
+        log.info("searching for user: {}'s enrolled courses", curUser);
         if (courses.isEmpty()) throw new DataNotFoundException("No Courses Found.");
         else return courses;
     }
 
     private void validateCourse(Course course) throws InvalidInputException {
-        logger.info("validating course: {}", course);
+        log.info("validating course: {}", course);
         if (course == null) throw new InvalidInputException("course is null, has not been instantiated");
         String regex = "[A-Z]{4}\\d{3}-\\d";
         //              [A-Z]{4}    checks for 4 capital letter, as subject/department
@@ -68,7 +69,7 @@ public class CourseService implements Serviceable<Course> {
         //              -\\d{2}     checks for 1 digit following "-", as a section number
         //              Example:    MATH101-1 for Math 101, Section 1
         if (!course.getCourseCode().matches(regex)) {
-            logger.warn("malformed course code: {}", course.getCourseCode());
+            log.warn("malformed course code: {}", course.getCourseCode());
             throw new InvalidInputException("Malformed course code");
         }
         //TODO: other criteria

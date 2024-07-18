@@ -1,18 +1,20 @@
 package com.revature.crs.Registration;
 
+import com.revature.crs.Course.CourseController;
 import com.revature.crs.util.ConnectionFactory;
 import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.exceptions.InvalidInputException;
 import com.revature.crs.util.interfaces.Crudable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.revature.crs.util.CourseRegistrationFrontController.logger;
-
 public class RegistrationRepository implements Crudable<Registration> {
+    private static final Logger log = LoggerFactory.getLogger(CourseController.class);
     // Data Access Object (DAO)
     @Override
     public boolean update(Registration updatedRegistration) {
@@ -26,8 +28,7 @@ public class RegistrationRepository implements Crudable<Registration> {
             preparedStatement.setInt(3, updatedRegistration.getStudentId());
             preparedStatement.setDate(4, Date.valueOf(updatedRegistration.getRegistrationDate()));
             preparedStatement.setInt(5, updatedRegistration.getRegistrationId());
-            logger.info("updating info to: {}", updatedRegistration);
-            logger.info("SQL: {}", preparedStatement);
+            log.info("SQL: {}", preparedStatement);
             if (preparedStatement.executeUpdate() == 0) throw new RuntimeException("Registration record not found.");
             else return true;
         } catch (SQLException e) {
@@ -44,7 +45,7 @@ public class RegistrationRepository implements Crudable<Registration> {
                 //checks that registration is within window
                 CallableStatement callableStatement = conn.prepareCall("call cancel_registration(?);");
                 callableStatement.setInt(1, id);
-                logger.info("SQL: {}", callableStatement);
+                log.info("SQL: {}", callableStatement);
                 callableStatement.execute();
                 callableStatement.close();
                 return true;
@@ -94,7 +95,7 @@ public class RegistrationRepository implements Crudable<Registration> {
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, id);
 
-            logger.info("SQL: {}", preparedStatement);
+            log.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (!resultSet.next()) throw new DataNotFoundException("Registration record not found.");
             return generateRegistrationFromResultSet(resultSet);
@@ -113,7 +114,7 @@ public class RegistrationRepository implements Crudable<Registration> {
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, curUser);
 
-            logger.info("SQL: {}", preparedStatement);
+            log.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) registrations.add(generateRegistrationFromResultSet(resultSet));

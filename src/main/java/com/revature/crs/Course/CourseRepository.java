@@ -3,14 +3,15 @@ package com.revature.crs.Course;
 import com.revature.crs.util.ConnectionFactory;
 import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.interfaces.Crudable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.revature.crs.util.CourseRegistrationFrontController.logger;
-
 public class CourseRepository implements Crudable<Course> {
+    private static final Logger log = LoggerFactory.getLogger(CourseController.class);
     // Data Access Object (DAO)
     @Override
     public boolean update(Course updatedCourse) {
@@ -23,7 +24,7 @@ public class CourseRepository implements Crudable<Course> {
             callableStatement.setShort(5, updatedCourse.getEnrolled());
             callableStatement.setInt(6, updatedCourse.getProfessor());
 
-            logger.info("SQL: {}", callableStatement);
+            log.info("SQL: {}", callableStatement);
             callableStatement.execute();
             callableStatement.close();
 
@@ -44,7 +45,7 @@ public class CourseRepository implements Crudable<Course> {
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, courseId);
 
-            logger.info("SQL: {}", preparedStatement);
+            log.info("SQL: {}", preparedStatement);
 
             if (preparedStatement.executeUpdate() == 0) throw new DataNotFoundException("Course not found.");
             else return true;
@@ -60,7 +61,7 @@ public class CourseRepository implements Crudable<Course> {
             List<Course> courses = new ArrayList<>();
             String sql = "select * from courses";
 
-            logger.info("SQL: {}", sql);
+            log.info("SQL: {}", sql);
             ResultSet resultSet = conn.createStatement().executeQuery(sql);
 
             while (resultSet.next()) courses.add(generateCourseFromResultSet(resultSet));
@@ -82,12 +83,12 @@ public class CourseRepository implements Crudable<Course> {
             preparedStatement.setShort(4, newCourse.getEnrolled());
             preparedStatement.setInt(5, newCourse.getProfessor());
 
-            logger.info("SQL: {}", preparedStatement);
+            log.info("SQL: {}", preparedStatement);
             if (preparedStatement.executeUpdate() == 0) {
-                logger.warn("course: {} not added", newCourse);
+                log.warn("course: {} not added", newCourse);
                 throw new RuntimeException("Course not added");
             }
-            logger.info("course: {} added", newCourse);
+            log.info("course: {} added", newCourse);
             return newCourse;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -102,15 +103,15 @@ public class CourseRepository implements Crudable<Course> {
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, id);
 
-            logger.info("SQL: {}", preparedStatement);
+            log.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) {
-                logger.warn("Information not found for courseId: {}", id);
+                log.warn("Information not found for courseId: {}", id);
                 throw new DataNotFoundException("No course with id:" + id + " exists in database.");
             }
             Course foundCourse = generateCourseFromResultSet(resultSet);
-            logger.info("returning found course: {}", foundCourse);
+            log.info("returning found course: {}", foundCourse);
             return foundCourse;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -123,7 +124,7 @@ public class CourseRepository implements Crudable<Course> {
             List<Course> courses = new ArrayList<>();
             String sql = "select * from courses where enrolled < capacity";
 
-            logger.info("SQL: {}", sql);
+            log.info("SQL: {}", sql);
             ResultSet resultSet = conn.createStatement().executeQuery(sql);
 
             while (resultSet.next()) courses.add(generateCourseFromResultSet(resultSet));
@@ -143,7 +144,7 @@ public class CourseRepository implements Crudable<Course> {
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, curUser);
 
-            logger.info("SQL: {}", preparedStatement);
+            log.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) courses.add(generateCourseFromResultSet(resultSet));

@@ -1,16 +1,16 @@
 package com.revature.crs.Registration;
 
-import com.revature.crs.Course.Course;
+import com.revature.crs.Course.CourseController;
 import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.exceptions.InvalidInputException;
 import com.revature.crs.util.interfaces.Serviceable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.time.LocalDate;
 import java.util.List;
 
-import static com.revature.crs.util.CourseRegistrationFrontController.logger;
-
 public class RegistrationService implements Serviceable<Registration> {
+    private static final Logger log = LoggerFactory.getLogger(CourseController.class);
     private RegistrationRepository registrationRepository;
 
     public RegistrationService(RegistrationRepository registrationRepository) {
@@ -52,7 +52,7 @@ public class RegistrationService implements Serviceable<Registration> {
     
     public List<Registration> findEnrolled(int curUser) {
         List<Registration> registrations = registrationRepository.getEnrolled(curUser);
-        logger.info("searching for user: {}'s registrations", curUser);
+        log.info("searching for user: {}'s registrations", curUser);
         if (registrations.isEmpty()) throw new DataNotFoundException("No Registration Records Found.");
         else return registrations;
     }

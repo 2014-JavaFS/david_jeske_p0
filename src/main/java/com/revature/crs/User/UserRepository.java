@@ -1,8 +1,11 @@
 package com.revature.crs.User;
 
+import com.revature.crs.Course.CourseController;
 import com.revature.crs.util.ConnectionFactory;
 import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.interfaces.Crudable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.security.sasl.AuthenticationException;
 import java.sql.Connection;
@@ -12,9 +15,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.revature.crs.util.CourseRegistrationFrontController.logger;
-
 public class UserRepository implements Crudable<User> {
+    private static final Logger log = LoggerFactory.getLogger(CourseController.class);
     // Data Access Object (DAO)
     @Override
     public boolean update(User updatedUser) {
@@ -30,7 +32,7 @@ public class UserRepository implements Crudable<User> {
             preparedStatement.setBoolean(5, updatedUser.isFaculty());
             preparedStatement.setInt(6, updatedUser.getUserID());
 
-            logger.info("SQL: {}", preparedStatement);
+            log.info("SQL: {}", preparedStatement);
             if (preparedStatement.executeUpdate() == 0) throw new RuntimeException("User not found.");
             else return true;
         } catch (SQLException e) {
@@ -46,7 +48,7 @@ public class UserRepository implements Crudable<User> {
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, userId);
 
-            logger.info("SQL: {}", preparedStatement);
+            log.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) throw new DataNotFoundException("No user found.");
@@ -63,7 +65,7 @@ public class UserRepository implements Crudable<User> {
             List<User> users = new ArrayList<>();
             String sql = "select * from users";
 
-            logger.info("SQL: {}", sql);
+            log.info("SQL: {}", sql);
             ResultSet resultSet = conn.createStatement().executeQuery(sql);
 
             while (resultSet.next()) users.add(generateUserFromResultSet(resultSet));
@@ -84,7 +86,7 @@ public class UserRepository implements Crudable<User> {
             preparedStatement.setString(4, newUser.getPassword());
             preparedStatement.setBoolean(5, newUser.isFaculty());
 
-            logger.info("SQL: {}", preparedStatement);
+            log.info("SQL: {}", preparedStatement);
             if (preparedStatement.executeUpdate() == 0) throw new RuntimeException("User not added.");
             return newUser;
         } catch (SQLException e) {
@@ -100,7 +102,7 @@ public class UserRepository implements Crudable<User> {
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1, id);
 
-            logger.info("SQL: {}", preparedStatement);
+            log.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) throw new DataNotFoundException("No user found.");
@@ -118,7 +120,7 @@ public class UserRepository implements Crudable<User> {
             preparedStatement.setString(1, email);
             preparedStatement.setString(2, password);
 
-            logger.info("SQL: {}", preparedStatement);
+            log.info("SQL: {}", preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) throw new AuthenticationException("Incorrect Email or Password");
@@ -137,7 +139,7 @@ public class UserRepository implements Crudable<User> {
         user.setEmail(resultSet.getString("email"));
         //user.setPassword(resultSet.getString("password"));
         //to not have user's password get out of database, not sure if this breaks anything
-        //TODO: ^^^test that <- seems fine
+        //TO/DO: ^test that <- seems fine
         user.setFaculty(resultSet.getBoolean("is_faculty"));
         return user;
     }

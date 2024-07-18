@@ -26,6 +26,8 @@ public class CourseRegistrationFrontController {
           config.jsonMapper(new JavalinJackson());
         });
 
+
+
         CourseRepository courseRepository = new CourseRepository();
         CourseService courseService = new CourseService(courseRepository);
         CourseController courseController = new CourseController(courseService);
