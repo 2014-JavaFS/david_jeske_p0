@@ -3,7 +3,11 @@
 A Course Registration System for both students and faculty.
 
 
-### User Stories
+![](src/main/resources/crs-ERD.png)
+
+
+
+## User Stories
 
 As any kind of user, I can:
 
