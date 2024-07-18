@@ -44,8 +44,10 @@ public class RegistrationController implements Controller {
 
         if (!isFaculty) {
             log.info("studentId: {} is registering for courseId: {}", studentId, courseId);
-            registrationService.create(new Registration(0, courseId, studentId, LocalDate.now()));
+            Registration registration = registrationService.create(new Registration(0, courseId, studentId, LocalDate.now()));
             ctx.status(402);
+            ctx.result("Registration made.");
+            log.info("Registration: {} created.", registration);
         } else {
             ctx.status(403);
             ctx.result("You can not register for a course at this time.");

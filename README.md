@@ -26,3 +26,10 @@ As any kind of user, I can:
 -   [x] register for an open and available class
 -   [x] cancel my registration for a class (if within window)
 -   [x] view the classes that I have registered for
+
+### Known Issues:
+
+- Any student can delete any registration
+- Most creation methods will just throw PSQLExceptions if you break any unique constraints
+- Many missing http responses/results 
+- Testing... completely broken
