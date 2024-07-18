@@ -1,12 +1,12 @@
 package com.revature.crs.Registration;
 
-import com.revature.crs.Course.Course;
 import com.revature.crs.util.ConnectionFactory;
 import com.revature.crs.util.exceptions.DataNotFoundException;
 import com.revature.crs.util.exceptions.InvalidInputException;
 import com.revature.crs.util.interfaces.Crudable;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +26,6 @@ public class RegistrationRepository implements Crudable<Registration> {
             preparedStatement.setInt(3, updatedRegistration.getStudentId());
             preparedStatement.setDate(4, Date.valueOf(updatedRegistration.getRegistrationDate()));
             preparedStatement.setInt(5, updatedRegistration.getRegistrationId());
-
             logger.info("updating info to: {}", updatedRegistration);
             logger.info("SQL: {}", preparedStatement);
             if (preparedStatement.executeUpdate() == 0) throw new RuntimeException("Registration record not found.");
@@ -40,26 +39,20 @@ public class RegistrationRepository implements Crudable<Registration> {
     @Override
     public boolean delete(int id) {
         try (Connection conn = ConnectionFactory.getConnectionFactory().getConnection()) {
-            CallableStatement callableStatement = conn.prepareCall("call cancel_registration(?);");
-            callableStatement.setInt(1, id);
-            logger.info("SQL: ", callableStatement);
-            callableStatement.execute();
-            callableStatement.close();
-            return false;
-            //TODO: uhhh do something about this
-//            String sql = "delete * from registrations where registration_id = ?";
-//            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-//            preparedStatement.setInt(1, id);
-//
-//            logger.info("SQL: {}", preparedStatement);
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//
-//            if (!resultSet.next()) throw new DataNotFoundException("Registration record not found.");
-//            return true;
+            Registration registration = findById(id);
+            if (registration.getRegistrationDate().plusWeeks(2).isAfter(LocalDate.now())) {
+                //checks that registration is within window
+                CallableStatement callableStatement = conn.prepareCall("call cancel_registration(?);");
+                callableStatement.setInt(1, id);
+                logger.info("SQL: {}", callableStatement);
+                callableStatement.execute();
+                callableStatement.close();
+                return true;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     @Override

@@ -25,7 +25,7 @@ public class RegistrationController implements Controller {
     @Override
     public void registerPaths(Javalin app) {
         app.get("/registrations", this::getAllRegistrations);
-        app.get("/registrations/enrolled", this::getMyRegistrations);
+        app.get("/registrations/enrolled", this::getEnrolledRegistrations);
         app.post("/registrations/", this::postNewRegistration);
         app.get("/registrations/{registration_id}", this::getRegistrationById);
         app.put("/registrations", this::putUpdateRegistration);
@@ -64,6 +64,7 @@ public class RegistrationController implements Controller {
         Registration updatedRegistration = ctx.bodyAsClass(Registration.class);
         try {
             if (registrationService.update(updatedRegistration)) {
+                ctx.result("Registration updated.");
                 ctx.status(HttpStatus.ACCEPTED);
             } else {
                 ctx.status(HttpStatus.BAD_REQUEST);
@@ -77,9 +78,10 @@ public class RegistrationController implements Controller {
         int registrationId = Integer.parseInt(ctx.queryParam("registration_id"));
         log.info("path info registration_id:{}", registrationId);
         try {
-            registrationService.delete(registrationId);
+            if (registrationService.delete(registrationId)) {
+                ctx.result("cancelled registration");
+            }
             ctx.status(200);
-            ctx.result("cancelled registration");
         } catch (DataNotFoundException e) {
             log.warn("registrationId: {} was not found, could not be deleted", registrationId);
             ctx.status(403);
@@ -89,7 +91,7 @@ public class RegistrationController implements Controller {
         }
     }
 
-    public void getMyRegistrations(Context ctx) {
+    public void getEnrolledRegistrations(Context ctx) {
         int curUser = Integer.parseInt(ctx.header("currentUserId"));
         boolean isFaculty = Boolean.valueOf(ctx.header("isFaculty"));
         log.info("Header info, isFaculty:{}, currentUserId:{}", isFaculty, curUser);
